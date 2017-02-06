@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.4
+-- version 4.6.5.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 02, 2017 at 11:23 PM
--- Server version: 5.7.15-log
--- PHP Version: 7.0.11
+-- Generation Time: Feb 06, 2017 at 08:28 PM
+-- Server version: 10.1.20-MariaDB
+-- PHP Version: 7.0.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -19,6 +19,38 @@ SET time_zone = "+00:00";
 --
 -- Database: `ists`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `acquired_resources`
+--
+
+CREATE TABLE `acquired_resources` (
+  `cid` int(11) NOT NULL,
+  `has_water` varchar(30) NOT NULL DEFAULT '0',
+  `has_electricity` varchar(30) NOT NULL DEFAULT '0',
+  `has_gas` varchar(30) NOT NULL DEFAULT '0',
+  `has_food` varchar(30) NOT NULL DEFAULT '0',
+  `has_luxury` varchar(30) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `acquired_resources`
+--
+
+INSERT INTO `acquired_resources` (`cid`, `has_water`, `has_electricity`, `has_gas`, `has_food`, `has_luxury`) VALUES
+(1, '0', '0', '0', '0', '0'),
+(2, '0', '0', '0', '0', '0'),
+(3, '0', '0', '0', '0', '0'),
+(4, '0', '0', '0', '0', '0'),
+(5, '0', '0', '0', '0', '0'),
+(6, '0', '0', '0', '0', '0'),
+(7, '0', '0', '0', '0', '0'),
+(8, '0', '0', '0', '0', '0'),
+(9, '0', '0', '0', '0', '0'),
+(10, '0', '0', '0', '0', '0'),
+(11, '0', '0', '0', '0', '0');
 
 -- --------------------------------------------------------
 
@@ -123,11 +155,11 @@ INSERT INTO `sessions` (`cid`, `sessionid`, `time`, `ip`) VALUES
 
 CREATE TABLE `starting_resources` (
   `cid` int(11) NOT NULL,
-  `has_water` int(1) NOT NULL DEFAULT '0',
-  `has_electricity` int(1) NOT NULL DEFAULT '0',
-  `has_gas` int(1) NOT NULL DEFAULT '0',
-  `has_food` int(1) NOT NULL DEFAULT '0',
-  `has_luxury` int(1) NOT NULL DEFAULT '0'
+  `has_water` varchar(30) NOT NULL DEFAULT '0',
+  `has_electricity` varchar(30) NOT NULL DEFAULT '0',
+  `has_gas` varchar(30) NOT NULL DEFAULT '0',
+  `has_food` varchar(30) NOT NULL DEFAULT '0',
+  `has_luxury` varchar(30) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -135,17 +167,17 @@ CREATE TABLE `starting_resources` (
 --
 
 INSERT INTO `starting_resources` (`cid`, `has_water`, `has_electricity`, `has_gas`, `has_food`, `has_luxury`) VALUES
-(1, 1, 1, 0, 0, 0),
-(2, 0, 1, 1, 0, 0),
-(3, 0, 0, 1, 1, 0),
-(4, 0, 0, 0, 1, 1),
-(5, 0, 0, 1, 1, 0),
-(6, 0, 1, 1, 0, 0),
-(7, 1, 1, 0, 0, 0),
-(8, 0, 1, 1, 0, 0),
-(9, 0, 0, 1, 1, 0),
-(10, 0, 0, 0, 1, 1),
-(11, 0, 0, 1, 1, 0);
+(1, '1', '1', '0', '0', '0'),
+(2, '0', '1', '1', '0', '0'),
+(3, '0', '0', '1', '1', '0'),
+(4, '0', '0', '0', '1', '1'),
+(5, '0', '0', '1', '1', '0'),
+(6, '0', '1', '1', '0', '0'),
+(7, '1', '1', '0', '0', '0'),
+(8, '0', '1', '1', '0', '0'),
+(9, '0', '0', '1', '1', '0'),
+(10, '0', '0', '0', '1', '1'),
+(11, '0', '0', '1', '1', '0');
 
 -- --------------------------------------------------------
 
@@ -182,6 +214,13 @@ INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `acquired_resources`
+--
+ALTER TABLE `acquired_resources`
+  ADD PRIMARY KEY (`cid`),
+  ADD UNIQUE KEY `cid` (`cid`);
 
 --
 -- Indexes for table `relations`
