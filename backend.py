@@ -131,9 +131,6 @@ def add_ally():
     
     cur.execute("INSERT INTO relations (atpeace%s) VALUES (1) WHERE cid=%s" % (cid2, cid))
     
-    # unsure if i want to automatically make both teams allies if only one of them adds the other
-    # maybe make it so they both have to add each other
-    #cur.execute("INSERT INTO relations (atpeace%s) VALUES (1) WHERE cid=%s" % (cid, cid2))
     db.commit()
 
     return 200
@@ -143,8 +140,7 @@ def add_ally():
 def remove_ally():
     """
         Handles request for removing an ally
-        first form element should be the requesting country
-        
+    
         :param session: the session of the country removing an ally
         :param country: the name of the country being removed
         :returns status: The status of the request, 200 for OK, 500+ if error
@@ -162,11 +158,14 @@ def remove_ally():
     cid2 = cur.fetchone()
     
     cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid2, cid))
-    
-    #cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid, cid2))
+    cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid, cid2))
     db.commit()
 
     # add the removal of the resources that they two teams share as well
+    # also re randomize the code so the team can't just re enter it and steal it
+    # also need to make sure we check if the code even exists before randomizing and re entering
+    # could have been stolen during that time
+
     return 200
 
 
@@ -209,6 +208,7 @@ def add_resource():
         :return status: status of the request, 200 for OK, 500+ for error
     """
     args = flask.request.args
+    cur = db.cursor()
     session = args['session']
     cid = authenticate(session)
     if not cid:
@@ -221,9 +221,16 @@ def add_resource():
     
     status = check_ally(cid, resource_owner)
     if status:
-        # add resource to database here
+        cur.execute("INSERT INTO acquired_resources (has_%s) VALUES (%s) WHERE cid=%s" 
+                    % (resource_type, resource, cid))
+        db.commit()
+    
     else:
-        # add resource to database of the one who entered it, remove it from the one who owns it
+        cur.execute("INSERT INTO starting_resources (has_%s) VALUES (%s) WHERE cid=%s" 
+                    % (resource_type, resource, cid))
+        cur.execute("UPDATE starting_resources SET has_%s=0 WHERE cid=%s"
+                    % (resource_type, resource_owner))    
+        db.commit()       
 
     return 200
 
