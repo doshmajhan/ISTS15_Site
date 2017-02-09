@@ -112,7 +112,9 @@ def check_resource(resource):
 def add_ally():
     """
         Handles request for adding an ally
-
+    
+        :param session: the session of the country adding an ally
+        :param country: the name of the country being added
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
     args = flask.request.args
@@ -142,7 +144,9 @@ def remove_ally():
     """
         Handles request for removing an ally
         first form element should be the requesting country
-
+        
+        :param session: the session of the country removing an ally
+        :param country: the name of the country being removed
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
     args = flask.request.args
@@ -151,7 +155,7 @@ def remove_ally():
     if not cid:
         return 401 # bad auth
 
-    country_to_remove = args['country2']
+    country_to_remove = args['country']
     cur = db.cursor()
 
     cur.execute("SELECT cid FROM users WHERE user = %s" % (country_to_remove))
@@ -170,8 +174,10 @@ def remove_ally():
 def declare_war():
     """
         Handles request for declaring war on a team
-        first form element should be the requesting country
+        first for
 
+        :param session: the session for the country declaring war
+        :param country: the name of the country being declared against
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
     args = flask.request.args
@@ -180,7 +186,7 @@ def declare_war():
     if not cid:
         return 401 # bad auth
 
-    country_to_attack = args['country2']
+    country_to_attack = args['country']
     cur = db.cursor()
 
     cur.execute("SELECT cid FROM users WHERE user = %s" % (country_to_attack))
@@ -198,6 +204,8 @@ def add_resource():
     """
         Handles adding a new resource to a country
 
+        :param session: the session of the country adding a resource
+        :param resource: the code of the resource being added
         :return status: status of the request, 200 for OK, 500+ for error
     """
     args = flask.request.args
@@ -206,13 +214,12 @@ def add_resource():
     if not cid:
         return 401 # bad auth
 
-    country = args['country']
     resource = args['resource']
     resource_owner, resource_type = check_resource(resource)
     if not resource_owner or not resource_type:
         return 503 # bad resource code
     
-    status = check_ally(country, resource_owner)
+    status = check_ally(cid, resource_owner)
     if status:
         # add resource to database here
     else:
