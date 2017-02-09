@@ -29,8 +29,9 @@ def update_code(database, code, resource, cid):
                          db='ists')
     cur = db.cursor()
     
-    cur.execute("INSERT INTO %s (has_%s) VALUES (%s) WHERE cid=%s"
+    cur.execute("UPDATE %s SET has_%s='%s' WHERE cid=%s"
                 % (database, resource, code, cid))
+
     db.commit()
 
 

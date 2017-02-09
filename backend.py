@@ -107,7 +107,7 @@ def add_ally():
     cur.execute("SELECT cid FROM users WHERE user = %s" % (country))
     cid2 = cur.fetchone()
     
-    cur.execute("INSERT INTO relations (atpeace%s) VALUES (1) WHERE cid=%s" % (cid2, cid))
+    cur.execute("UPDATE relations SET atpeace%s=1 WHERE cid=%s" % (cid2, cid))
     
     db.commit()
 
@@ -135,8 +135,8 @@ def remove_ally():
     cur.execute("SELECT cid FROM users WHERE user = %s" % (country_to_remove))
     cid2 = cur.fetchone()
     
-    cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid2, cid))
-    cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid, cid2))
+    cur.execute("UPDATE relations SET atpeace%s=0 WHERE cid=%s" % (cid2, cid))
+    cur.execute("UPDATE relations SET atpeace%s=0 WHERE cid=%s" % (cid, cid2))
 
     # also re randomize the code so the team can't just re enter it and steal it
     # also need to make sure we check if the code even exists before randomizing and re entering
@@ -188,8 +188,8 @@ def declare_war():
     cur.execute("SELECT cid FROM users WHERE user = %s" % (country_to_attack))
     cid2 = cur.fetchone()
     
-    cur.execute("INSERT INTO relations (atwar%s) VALUES (1) WHERE cid=%s" % (cid2, cid))
-    cur.execute("INSERT INTO relations (atwar%s) VALUES (1) WHERE cid=%s" % (cid, cid2))
+    cur.execute("UPDATE relations SET atwar%s=1 WHERE cid=%s" % (cid2, cid))
+    cur.execute("UPDATE relations SET atwar%s=1 WHERE cid=%s" % (cid, cid2))
     db.commit()
 
     return 200
@@ -218,13 +218,13 @@ def add_resource():
     
     status = check_ally(cid, resource_owner)
     if status:
-        cur.execute("INSERT INTO acquired_resources (has_%s) VALUES (%s) WHERE cid=%s" 
+        cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid=%s" 
                     % (resource_type, resource, cid))
     
     else:
-        cur.execute("INSERT INTO starting_resources (has_%s) VALUES (%s) WHERE cid=%s" 
+        cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid=%s" 
                     % (resource_type, resource, cid))
-        cur.execute("UPDATE starting_resources SET has_%s=0 WHERE cid=%s"
+        cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid=%s"
                     % (resource_type, resource_owner))    
     
     db.commit()       
@@ -234,4 +234,4 @@ def add_resource():
 
 if __name__ == '__main__':
     db = connect_db()
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
