@@ -4,6 +4,8 @@ import MySQLdb
 from flask import Flask
 app = Flask(__name__)
 
+resources = ['water', 'gas', 'food', 'electricity', 'water']
+
 def connect_db():
     """
         Create our connection to the mysql database
@@ -74,37 +76,13 @@ def check_resource(resource):
         :return type: the type of resource the code is for
     """
     cur = db.cursor()
+
+    for r in resources:
+        cur.execute("SELECT cid FROM starting_resources WHERE has_%s=%s" % (r, resource))
+        cid = cur.fetchone()
+        if cid:
+            return (cid, r)
     
-    # check if it's a code for water
-    cur.execute("SELECT cid FROM starting_resources WHERE has_water=%s" % (resource))
-    cid = cur.fetchone()
-    if cid:
-        return (cid, "water")
-
-    # check if it's a code for gas
-    cur.execute("SELECT cid FROM starting_resources WHERE has_gas=%s" % (resource))
-    cid = cur.fetchone()
-    if cid:
-        return (cid, "gas")
-
-    # check if it's a code for electricity
-    cur.execute("SELECT cid FROM starting_resources WHERE has_electricity=%s" % (resource))
-    cid = cur.fetchone()
-    if cid:
-        return (cid, "electricity")
-
-    # check if it's a code for food
-    cur.execute("SELECT cid FROM starting_resources WHERE has_food=%s" % (resource))
-    cid = cur.fetchone()
-    if cid:
-        return (cid, "food")
-
-    # check if it's a code for luxury
-    cur.execute("SELECT cid FROM starting_resources WHERE has_luxury=%s" % (resource))
-    cid = cur.fetchone()
-    if cid:
-        return (cid, "luxury")
-
     return (None, None)
 
 
@@ -159,12 +137,31 @@ def remove_ally():
     
     cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid2, cid))
     cur.execute("INSERT INTO relations (atpeace%s) VALUES (0) WHERE cid=%s" % (cid, cid2))
-    db.commit()
 
-    # add the removal of the resources that they two teams share as well
     # also re randomize the code so the team can't just re enter it and steal it
     # also need to make sure we check if the code even exists before randomizing and re entering
     # could have been stolen during that time
+    
+    for r in resource:
+        # Check if remover is using a resource of the removee, if so remove it
+        cur.execute("SELECT has_%s FROM acquired_resources WHERE cid=%s" % (r, cid))
+        acquired_resource = cur.fetchone()
+        cur.execute("SELECT has_%s FROM starting_resources WHERE cid=%s" % (r, cid2)
+        original_resource = cur.fetchone()
+        if acquired_resource == original_resource:
+            cur.execute("UPDATE acquired_resources SET has_%s=0 WHERE cid=%s"
+                        % (resource, cid))
+    
+        # check if the removee is using a resource of the remover
+        cur.execute("SELECT has_%s FROM starting_resources WHERE cid=%s" % (r, cid))
+        original_resource = cur.fetchone()
+        cur.execute("SELECT has_%s FROM acquired_resources WHERE cid=%s" % (r, cid2))
+        acquired_resource = cur.fetchone()
+        if acquired_resource == original_resource:
+            cur.execute("UPDATE acquired_resources SET has_%s=0 WHERE cid=%s"
+                        % (r, cid2))
+
+    db.commit()
 
     return 200
 
@@ -223,14 +220,14 @@ def add_resource():
     if status:
         cur.execute("INSERT INTO acquired_resources (has_%s) VALUES (%s) WHERE cid=%s" 
                     % (resource_type, resource, cid))
-        db.commit()
     
     else:
         cur.execute("INSERT INTO starting_resources (has_%s) VALUES (%s) WHERE cid=%s" 
                     % (resource_type, resource, cid))
         cur.execute("UPDATE starting_resources SET has_%s=0 WHERE cid=%s"
                     % (resource_type, resource_owner))    
-        db.commit()       
+    
+    db.commit()       
 
     return 200
 
