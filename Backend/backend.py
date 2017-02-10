@@ -176,6 +176,65 @@ def get_resources():
     json_data['acquired_resources'] = acquired_resources
     return jsonify(json_data)
 
+@app.route('/getallies' methods=['GET'])
+def get_allies():
+    """
+        Returns the allies for the requesting country
+
+        :param session: the session token for the requesting country
+        :return allies_json: a json object of the allies 
+    """
+    args = flask.request.args
+    session = args['session']
+    cid = authenticate(session)
+    if not cid:
+        return bad_auth()
+    
+    allies_json = {}
+    allies_json['allies'] = []
+    cur = db.cursor()
+    
+    for x in range(1, 12):
+        cur.execute("SELECT at_peace%s FROM relations WHERE cid='%s'" % (x, cid))
+        relation = cur.fetchone()
+        relation = int(relation[0])
+        if relation:
+            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
+            country = cur.fetchone()[0]
+            allies_json['allies'] += [country]
+
+    return jsonify(allies_json)
+
+
+@app.route('/getenemies' methods=['GET'])
+def get_enemies():
+    """
+        Returns the enemies for the requesting country
+
+        :param session: the session token for the requesting country
+        :return enemies_json: a json object of the allies 
+    """
+    args = flask.request.args
+    session = args['session']
+    cid = authenticate(session)
+    if not cid:
+        return bad_auth()
+    
+    enemies_json = {}
+    enemies_json['enemies'] = []
+    cur = db.cursor()
+    
+    for x in range(1, 12):
+        cur.execute("SELECT at_war%s FROM relations WHERE cid='%s'" % (x, cid))
+        relation = cur.fetchone()
+        relation = int(relation[0])
+        if relation:
+            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
+            country = cur.fetchone()[0]
+            enemies_json['enemies'] += [country]
+
+    return jsonify(enemies_json)
+
 
 @app.route('/addally', methods=['GET', 'POST'])
 def add_ally():
