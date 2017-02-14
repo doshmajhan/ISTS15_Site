@@ -4,6 +4,7 @@
     @author: Doshmajhan
 """
 
+import code_generator
 import flask
 import hashlib
 import MySQLdb
@@ -106,6 +107,29 @@ def check_resource(resource):
     return (None, None)
 
 
+def randomize_resource(resource, cid, old_code)
+    """
+        Re randomizes the resource of a given country after they have removed an ally
+        so that there ally can't just take their code right after and re-enter it, also
+        updates the code for the allies they share it with
+
+        :param resource: the resource being randomized
+        :param cid: the cid of the country
+        :param old_code: the old code value
+    """
+    cur = db.cursor()
+    new_code = code_generator.create_code()
+    code_generator.update_code('starting_resources', new_code, resource, cid)
+    cur.execute("SELECT cid FROM acquired_resources WHERE has_%s='%s'" % 
+                (resource, old_code))
+    ally_list = cur.fetchall()
+    if ally_list:
+        for ally in ally_list:
+            cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'" %
+                        (resource, new_code, ally[0]))
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -176,7 +200,8 @@ def get_resources():
     json_data['acquired_resources'] = acquired_resources
     return jsonify(json_data)
 
-@app.route('/getallies' methods=['GET'])
+
+@app.route('/getallies', methods=['GET'])
 def get_allies():
     """
         Returns the allies for the requesting country
@@ -206,7 +231,7 @@ def get_allies():
     return jsonify(allies_json)
 
 
-@app.route('/getenemies' methods=['GET'])
+@app.route('/getenemies', methods=['GET'])
 def get_enemies():
     """
         Returns the enemies for the requesting country
@@ -307,7 +332,9 @@ def remove_ally():
             print "Removing %s from %d" % (r, cid)
             cur.execute("UPDATE acquired_resources SET has_%s='0' WHERE cid='%s'"
                         % (r, cid))
-    
+
+            #randomize_code(r, cid2, original_resource)
+
         # check if the removee is using a resource of the remover
         cur.execute("SELECT has_%s FROM starting_resources WHERE cid='%s'" % (r, cid))
         original_resource = cur.fetchone()
@@ -321,6 +348,8 @@ def remove_ally():
             print "Removing %s from %d" % (r, cid2)
             cur.execute("UPDATE acquired_resources SET has_%s='0' WHERE cid='%s'"
                         % (r, cid2))
+
+            #randomize_code(r, cid, original_resource)
 
     db.commit()
 
@@ -384,6 +413,7 @@ def add_resource():
                     % (resource_type, resource, cid))
     
     else:
+        # need to remove the resource from people who are sharing it with that person too
         cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
                     % (resource_type, resource, cid))
         cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
