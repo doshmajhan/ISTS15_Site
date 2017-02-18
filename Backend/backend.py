@@ -15,6 +15,9 @@ app = Flask(__name__)
 
 resources = ['water', 'gas', 'food', 'electricity', 'water']
 
+
+# Add function to get all conflicts of countrys, whos attacking who etc
+
 def connect_db():
     """
         Create our connection to the mysql database
@@ -107,7 +110,7 @@ def check_resource(resource):
     return (None, None)
 
 
-def randomize_resource(resource, cid, old_code)
+def randomize_resource(resource, cid, old_code):
     """
         Re randomizes the resource of a given country after they have removed an ally
         so that there ally can't just take their code right after and re-enter it, also
@@ -147,10 +150,12 @@ def login():
                 % (country, password))
 
     cid = cur.fetchone()
+    print cid
     if not cid:
         return bad_auth()
     cid = int(cid[0])
-
+    
+    # make random sessions, not hashing
     m = hashlib.md5()
     m.update(country+password)
     session = m.hexdigest()
@@ -159,19 +164,44 @@ def login():
     cur.execute("UPDATE sessions SET sessionid='%s', time='%s', ip='%s' WHERE cid=%s"
                 % (session, t, ip, cid))
     db.commit()
+
     return session
+
+
+@app.route('/getname', methods=['GET'])
+def get_name():
+    """
+        Returns the name of the country that is logged in
+
+        :param session: the session id of the country thats logged in
+        :return name: the name of the country
+    """
+    args = flask.request.args
+    session = args['session']
+    cid = authenticate(session)
+    if not cid:
+        return bad_auth()
+    
+    cur = db.cursor()
+    cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
+    name = cur.fetchone()
+    if not name:
+        status = {'False': 'Could not find your country, how are you even logged in'}
+        return jsonify(status)
+
+    status = {'True': '%s' % str(name[0]) }
+    return jsonify(status)
 
 
 @app.route('/getresources', methods=['GET'])
 def get_resources():
     """
         Returns the resources currently owned by that country
-
-        :param country: the country that owns the resources
+        
+        :param session: the session of the country requesting its resources
         :returns resource: a json object of the resources
     """
     args = flask.request.args
-    country = args['country']
     session = args['session']
     cid = authenticate(session)
     if not cid:
@@ -211,20 +241,30 @@ def get_allies():
     """
     args = flask.request.args
     session = args['session']
-    cid = authenticate(session)
-    if not cid:
-        return bad_auth()
+    country = args['country']  
+    cur = db.cursor()
+    if country: 
+        cur.execute("SELECT cid FROM users WHERE countryname='%s'" % (country))
+        cid = cur.fetchone()
+        if not cid:
+            status = {'False' : '%s is not a country' % country}
+            return jsonify(status)
+        cid = int(cid[0])
+
+    else:
+        cid = authenticate(session)
+        if not cid:
+            return bad_auth()
     
     allies_json = {}
     allies_json['allies'] = []
-    cur = db.cursor()
     
     for x in range(1, 12):
-        cur.execute("SELECT at_peace%s FROM relations WHERE cid='%s'" % (x, cid))
+        cur.execute("SELECT atpeace%s FROM relations WHERE cid='%s'" % (x, cid))
         relation = cur.fetchone()
         relation = int(relation[0])
         if relation:
-            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
+            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (x))
             country = cur.fetchone()[0]
             allies_json['allies'] += [country]
 
@@ -241,20 +281,30 @@ def get_enemies():
     """
     args = flask.request.args
     session = args['session']
-    cid = authenticate(session)
-    if not cid:
-        return bad_auth()
+    country = args['country']
+    cur = db.cursor()
+    if country:        
+        cur.execute("SELECT cid FROM users WHERE countryname='%s'" % (country))
+        cid = cur.fetchone()
+        if not cid:
+            status = {'False' : '%s is not a country' % country}
+            return jsonify(status)
+        cid = int(cid[0])
+
+    else:
+        cid = authenticate(session)
+        if not cid:
+            return bad_auth()
     
     enemies_json = {}
     enemies_json['enemies'] = []
-    cur = db.cursor()
     
     for x in range(1, 12):
-        cur.execute("SELECT at_war%s FROM relations WHERE cid='%s'" % (x, cid))
+        cur.execute("SELECT atwar%s FROM relations WHERE cid='%s'" % (x, cid))
         relation = cur.fetchone()
         relation = int(relation[0])
         if relation:
-            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
+            cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (x))
             country = cur.fetchone()[0]
             enemies_json['enemies'] += [country]
 
@@ -281,12 +331,21 @@ def add_ally():
 
     cur.execute("SELECT cid FROM users WHERE countryname='%s'" % (country_to_add))
     cid2 = cur.fetchone()
+    if not cid2:
+        status = {'False': "%s isn't a country" % country_to_add}
+        return jsonify(status)
+    
     cid2 = int(cid2[0]) 
+    if cid == cid2:
+        status = {'False': "Can't add yourself" }
+        return jsonify(status)
+
     cur.execute("UPDATE relations SET atpeace%s='1' WHERE cid='%s'" % (cid2, cid))
     
     db.commit()
-
-    return flask.Response('Ally added', status=200, mimetype='text/html')
+    
+    status = {'True': '%s added as ally' % country_to_add}
+    return jsonify(status)
 
 
 @app.route('/removeally', methods=['GET', 'POST'])
@@ -309,7 +368,14 @@ def remove_ally():
 
     cur.execute("SELECT cid FROM users WHERE countryname='%s'" % (country_to_remove))
     cid2 = cur.fetchone()
+    if not cid2:
+        status = {'False': '%s is not a country' % country_to_remove}
+        return jsonify(status)
+
     cid2 = int(cid2[0])
+    if cid2 == cid:
+        status = {'False': 'Can not remove yourself'}
+        return jsonify(status)
 
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid, cid2))
@@ -352,8 +418,9 @@ def remove_ally():
             #randomize_code(r, cid, original_resource)
 
     db.commit()
-
-    return flask.Response('Ally removed', status=200, mimetype='text/html')
+    
+    status = {'True': '%s removed as an ally' % country_to_remove }
+    return jsonify(status)
 
 
 @app.route('/declarewar', methods=['GET', 'POST'])
@@ -377,13 +444,23 @@ def declare_war():
 
     cur.execute("SELECT cid FROM users WHERE countryname='%s'" % (country_to_attack))
     cid2 = cur.fetchone()
+    if not cid2:
+        status = {'False': '%s is not a country' % country_to_attack}
+        return jsonify(status)
+
     cid2 = int(cid2[0])
+    if cid2 == cid:
+        status = {'True': 'Can not declare war against yourself' }
+        return jsonify(status)
 
+    # add code to remove as ally 
     cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid2, cid))
-    cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid, cid2))
-    db.commit()
+    cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
 
-    return flask.Response('War declared', status=200, mimetype='text/html')
+    db.commit()
+    status = {'True' : 'Declared war against %s' % country_to_attack }
+
+    return jsonify(status)
 
 
 @app.route('/addresource', methods=['GET', 'POST'])
@@ -405,7 +482,12 @@ def add_resource():
     resource = args['resource']
     resource_owner, resource_type = check_resource(resource)
     if not resource_owner or not resource_type:
-        return flask.Response('Invalid resource code', status=403, mimetype='text/html')
+        status = {'False': 'Bad resource code'}
+        return jsonify(status)
+
+    if resource_owner == cid:
+        status = {'False': "Can't add your own resource"}
+        return jsonify(status)
 
     status = check_ally(cid, resource_owner)
     if status:
@@ -421,7 +503,8 @@ def add_resource():
     
     db.commit()       
 
-    return flask.Response('Resource added', status=200, mimetype='text/html')
+    status = {'True': 'Resource added: %s' % resource}
+    return jsonify(status)
 
 
 if __name__ == '__main__':
