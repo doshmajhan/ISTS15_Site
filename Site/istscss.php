@@ -69,6 +69,9 @@ body {
     list-style-type: none;
     padding: 0;
 	margin: 0;
+
+	font-family: "Arial Bold";
+	font-size: 20px;		
 }
 
 #menuul li {
@@ -83,32 +86,14 @@ body {
     text-decoration: none;
 }
 
+.menuul_active {
+    background-color: #063346;
+	
+}
+
 #menuul li a:hover {
     background-color: #FFF;
 	color: black;
-}
-#searchbar {
-	position: relative;
-	padding-left: -20%;
-}
-.btn {
-	text-transform: uppercase;
-	color: #fff;
-	background-color: #063346;
-	border-radius: 0;
-    text-shadow: none;
-	border: none;
-	font-family: "Open Sans";
-    font-weight: bold;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-	-webkit-font-smoothing: antialiased;
-}
-
-.btn:hover {
-	background-color: #46aee5;
-
 }
 
 #splash {
@@ -174,20 +159,29 @@ body {
 	height: 100px;
 	background-color: #04689b;
 	border: 1px solid black;
+	padding-left: 10%;
+
 }
 #titletext{
 	position: relative;
 	font-size: 28px;	
 	color: white;
 	text-transform: uppercase;
-	padding-left: 10%;
-	top: 30%;
+	padding-top: 10%;
+	padding-left: 5%;
+
+}
+.title_icon{
+	width: 50px;
+	height: 50px;
+	padding-top: 35%;	
 }
 #data {
 	position: relative;
 	color: white;
-	height: 270px;
 	min-height: 270px;
+	padding-top:20px;
+	padding-bottom: 20px;
 	background-color: #17415f;
 }
 #page_data {
@@ -195,13 +189,85 @@ body {
 	padding-top: 1%;
 	max-width: 100%;
 	min-width: 100%;
-	min-height: 100%;
 	margin-left: 0%;
 	margin-right: 30%;
 	text-align: center;
 	color: white;
+}
+
+.conflict_text{
+	color:white;
+}
+.resource_image{
+	width:250px;
+	height:250px;
+}
+
+#resource_table{
+	position:relative;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+#resource_table a{
+    color: white;
+    text-decoration: none;
+}
+
+.resource_text{
+	text-align: center;
+	color: white;
+	font-family: "Arial Bold";
+	font-size: 20px;	
+}
+
+#conflict_table{
+	position: relative;
+	border-collapse: collapse;
+    margin-left:auto; 
+    margin-right:auto;	
+}
+
+.front_image{
+	width:75px;
+	height:75px;
+}
+
+#front_table{
+    margin-left:auto; 
+    margin-right:auto;	
+	position:relative;
+	width: 60%;
+	border-collapse: collapse;
+}
+
+.btn {
+	margin-top: 25px;
+	text-transform: uppercase;
+	color: #fff;
+	background-color: #0a5c87;
+	border-radius: 0;
+    text-shadow: none;
+	border: none;
+	padding: 14px;
+	font-family: "Open Sans";
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+	-webkit-font-smoothing: antialiased;
+}
+
+.btn:hover {
+	background-color: #063346;
 
 }
+
+#map{
+	width:100%;
+	height:64%;
+}
+
 #lockbox {
 	position: absolute;
 	left:15%;
@@ -210,8 +276,8 @@ body {
 }
 #login_box {
 	position: relative;
-	left: 05%;
-	margin-top: -40%;
+	left: 30%;
+	margin-top: -14%;
 	min-height: 100%;
 }
 #footer {

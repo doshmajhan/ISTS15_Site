@@ -14,7 +14,7 @@
 				Financial Services
 			</td>
 			<td id="login">
-				log In
+				<a href="ists_login.php">Log In</a>
 			</td>
 			</tr>
 			</table>
@@ -27,10 +27,6 @@
 				<!-- Placeholder -->
 			</ul>
 			</td>
-			<td>
-			<div id="searchbar">
-				<input type="text" placeholder="Search">
-				<button class=btn>Search</button>
 			</div>
 			</td>
 			</tr>
