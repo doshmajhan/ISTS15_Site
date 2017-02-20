@@ -37,7 +37,7 @@ if __name__ == '__main__':
     while True:
         current_disaster = pick_disaster()
         resource = disaster_list[current_disaster]
-        for cid in range(1, 12):
+        for cid in range(1, 11):
             #resource_poller.poll(cid, resource)
             print "Polling %d, %s" % (cid, resource)
 

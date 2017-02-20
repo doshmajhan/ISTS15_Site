@@ -5,7 +5,7 @@ resources=('water' 'electricity' 'gas' 'food' 'luxury')
 count=0
 add=1
 echo "Populating..."
-for i in `seq 1 11`;
+for i in `seq 1 10`;
 do
     if [ "$count" -eq 4 ];
     then
