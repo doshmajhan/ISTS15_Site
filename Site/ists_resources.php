@@ -35,7 +35,7 @@
 	?>
 	<?php
 		$res = array("water"=>"","food"=>"","electricity"=>"","gas"=>"","luxury"=>"" );
-		$resources = get_res($backend,$scheme,$port,$session);
+		$resources = get_res($backend,$scheme,$port,$_SESSION['session']);
 		$starting = $resources['starting_resources'];
 
 		foreach($starting as $val2){

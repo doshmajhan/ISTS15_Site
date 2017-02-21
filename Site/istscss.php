@@ -195,6 +195,14 @@ body {
 	color: white;
 }
 
+#sign_table{
+	position: relative;
+	border-collapse: collapse;
+    margin-left:auto; 
+    margin-right:auto;	
+	
+}
+
 .conflict_text{
 	color:white;
 }
@@ -279,6 +287,7 @@ body {
 	left: 30%;
 	margin-top: -14%;
 	min-height: 100%;
+	color: white;
 }
 #footer {
 	position: relative;

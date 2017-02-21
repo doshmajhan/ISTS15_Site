@@ -15,11 +15,13 @@
 				});				
 			});
 		}).change();
-		var my_country = "<?php echo get_name($backend,$scheme,$port,$session); ?>";
+		var my_country = "<?php echo get_name($backend,$scheme,$port,$_SESSION['session']); ?>";
 		$("#country_select option").each(function(){
-			if($(this).text()==my_country){ // EDITED THIS LINE
+			if($(this).text()==my_country){
 				$(this).attr("selected","selected");
 				var country_name = $( this ).text();
+				setTimeout(function(){
+				}, 500);				
 				$.get( "get_conflicts.php?country="+country_name, function( data ) {
 				  $( "#conflict_data" ).html( data );
 				});					

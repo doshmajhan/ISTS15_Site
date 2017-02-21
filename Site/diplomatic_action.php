@@ -1,4 +1,8 @@
 <?php 
+if(!isset($_SESSION)) { session_start(); }	
+if(!isset($_SESSION)){
+	die();
+}
 if(!isset($_GET['action']) or !isset($_GET['country'])){
 	exit("We didn't get the arguments we expected");
 }
@@ -9,7 +13,7 @@ if($_GET['action'] === "peace"){
 	$countryCode = $_GET['country'];
 	$index = array_search($countryCode, $countryAck);
 	$mycountry = $countries[$index];
-	$response = add_ally($backend,$scheme,$port,$session,$mycountry);
+	$response = add_ally($backend,$scheme,$port,$_SESSION['session'],$mycountry);
 	if(isset($response['False'])){
 		echo $response['False'];
 	}
@@ -22,7 +26,7 @@ if($_GET['action'] === "war"){
 	$countryCode = $_GET['country'];
 	$index = array_search($countryCode, $countryAck);
 	$mycountry = $countries[$index];
-	$response = declare_war($backend,$scheme,$port,$session,$mycountry);
+	$response = declare_war($backend,$scheme,$port,$_SESSION['session'],$mycountry);
 	if(isset($response['False'])){
 		echo $response['False'];
 	}
@@ -35,7 +39,7 @@ if($_GET['action'] === "neutral"){
 	$countryCode = $_GET['country'];
 	$index = array_search($countryCode, $countryAck);
 	$mycountry = $countries[$index];
-	$response = make_neutral($backend,$scheme,$port,$session,$mycountry);
+	$response = make_neutral($backend,$scheme,$port,$_SESSION['session'],$mycountry);
 	if(isset($response['False'])){
 		echo $response['False'];
 	}

@@ -1,5 +1,6 @@
 	<?php
 		$team_settings = parse_ini_file("ists_settings.ini");
+		if(!isset($_SESSION)) { session_start(); }		
 		include_once('api_calls.php');
 	?>
 	<link rel="stylesheet" type="text/css" href="istscss.php?teamname=<?php echo $team_settings['name']; ?>">

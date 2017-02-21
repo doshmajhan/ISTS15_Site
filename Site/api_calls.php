@@ -19,7 +19,7 @@ function login($backend,$scheme,$port,$country,$password){
 	$session = curl_exec($ch); 
 	curl_close($ch);
 	if(strlen($session) != 32){
-		exit("Error: Couldn't Log In");
+		return("Error: Couldn't Log In");
 	}
 	return $session;
 }
@@ -235,11 +235,11 @@ function get_name($backend,$scheme,$port,$session){
 	$response = json_decode($response);
 	$response = json_decode(json_encode($response), True);
 	# Check if it is an array;
-	if(!is_array($response)){
-		exit("Error: We didn't get the response we expected");		
+	if(!is_array($response)){		
+		echo ("Error: We didn't get the response we expected");		
 	}
 	if(isset($response['False'])){
-		exit("We were unable to obtain your country name");
+		echo ("We were unable to obtain your country name");
 	}
 	if(isset($response['True'])){
 		return $response['True'];
@@ -251,7 +251,7 @@ function get_name($backend,$scheme,$port,$session){
 $backend = "184.73.151.60";
 $scheme = "http";
 $port = "5000";
-$session = login($backend,$scheme,$port,"United States","password");
+#$session = login($backend,$scheme,$port,"United States","password");
 //echo get_name($backend,$scheme,$port,$session);
 //get_res($backend,$scheme,$port,$session);
 //add_res($backend,$scheme,$port,$session,'GBZ658P9NJXXXFAW5FFVOEOXMSKV2Z')
