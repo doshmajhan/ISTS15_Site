@@ -102,7 +102,7 @@ body {
 	height: 400px;
 	margin: 0;
 	background: black;
-	background: linear-gradient(to right,rgba(0,0,0, 100)60%,rgba(0,0,0, 0)),url(images/<?php echo $_GET['teamname']; ?>.png);
+	background: linear-gradient(to right,rgba(0,0,0, 100)60%,rgba(0,0,0, 0)),url(images/<?php echo strtolower($_GET['teamname']); ?>.png);
 
 	background-position: right;
 }
