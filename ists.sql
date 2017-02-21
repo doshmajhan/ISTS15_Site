@@ -49,8 +49,7 @@ INSERT INTO `acquired_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 (7, '0', '0', '0', '0', '0'),
 (8, '0', '0', '0', '0', '0'),
 (9, '0', '0', '0', '0', '0'),
-(10, '0', '0', '0', '0', '0'),
-(11, '0', '0', '0', '0', '0');
+(10, '0', '0', '0', '0', '0');
 
 -- --------------------------------------------------------
 
@@ -86,7 +85,6 @@ CREATE TABLE `relations` (
   `atwar8` int(1) NOT NULL DEFAULT '0',
   `atwar9` int(1) NOT NULL DEFAULT '0',
   `atwar10` int(1) NOT NULL DEFAULT '0',
-  `atwar11` int(1) NOT NULL DEFAULT '0',
   `atpeace1` int(1) NOT NULL DEFAULT '0',
   `atpeace2` int(1) NOT NULL DEFAULT '0',
   `atpeace3` int(1) NOT NULL DEFAULT '0',
@@ -97,14 +95,13 @@ CREATE TABLE `relations` (
   `atpeace8` int(1) NOT NULL DEFAULT '0',
   `atpeace9` int(1) NOT NULL DEFAULT '0',
   `atpeace10` int(1) NOT NULL DEFAULT '0',
-  `atpeace11` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `relations`
 --
 
-INSERT INTO `relations` (`cid`, `atwar1`, `atwar2`, `atwar3`, `atwar4`, `atwar5`, `atwar6`, `atwar7`, `atwar8`, `atwar9`, `atwar10`, `atwar11`, `atpeace1`, `atpeace2`, `atpeace3`, `atpeace4`, `atpeace5`, `atpeace6`, `atpeace7`, `atpeace8`, `atpeace9`, `atpeace10`, `atpeace11`) VALUES
+INSERT INTO `relations` (`cid`, `atwar1`, `atwar2`, `atwar3`, `atwar4`, `atwar5`, `atwar6`, `atwar7`, `atwar8`, `atwar9`, `atwar10`, `atpeace1`, `atpeace2`, `atpeace3`, `atpeace4`, `atpeace5`, `atpeace6`, `atpeace7`, `atpeace8`, `atpeace9`, `atpeace10`) VALUES
 (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -114,8 +111,7 @@ INSERT INTO `relations` (`cid`, `atwar1`, `atwar2`, `atwar3`, `atwar4`, `atwar5`
 (7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -145,7 +141,6 @@ INSERT INTO `sessions` (`cid`, `sessionid`, `time`, `ip`) VALUES
 (8, 'invalid', NULL, NULL),
 (9, 'invalid', NULL, NULL),
 (10, 'invalid', NULL, NULL),
-(11, 'invalid', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -177,7 +172,6 @@ INSERT INTO `starting_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 (8, '0', '1', '1', '0', '0'),
 (9, '0', '0', '1', '1', '0'),
 (10, '0', '0', '0', '1', '1'),
-(11, '0', '0', '1', '1', '0');
 
 -- --------------------------------------------------------
 
@@ -206,10 +200,9 @@ INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, 
 (5, 'China', 'password', 5, 10000, 0),
 (6, 'South Korea', 'password', 6, 10000, 0),
 (7, 'Jamaica', 'password', 7, 10000, 0),
-(8, 'Japan', 'password', 8, 10000, 0),
+(8, 'Germany', 'password', 8, 10000, 0),
 (9, 'Finland', 'password', 9, 10000, 0),
 (10, 'India', 'password', 10, 10000, 0),
-(11, 'Germany', 'password', 11, 10000, 0);
 
 --
 -- Indexes for dumped tables

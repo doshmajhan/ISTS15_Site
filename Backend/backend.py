@@ -6,17 +6,16 @@
 
 import code_generator
 import flask
-import hashlib
 import MySQLdb
+import random
+import string
 import time
 from flask import Flask
 from flask import jsonify
 app = Flask(__name__)
 
-resources = ['water', 'gas', 'food', 'electricity', 'water']
+resources = ['water', 'gas', 'food', 'electricity', 'luxury']
 
-
-# Add function to get all conflicts of countrys, whos attacking who etc
 
 def connect_db():
     """
@@ -39,6 +38,23 @@ def bad_auth():
     return resp
 
 
+def log_action(src, dst, action, data, ip):
+    """
+        Logs a action that is performed on the web app
+
+        :param src: the cid of the country that performed the action
+        :param dst: the cid of the country the action is performed against
+        :param action: what was performed
+        :param data: the information passed in the action
+        :param ip: the ip of the source 
+    """
+    cur = db.cursor()
+    t = time.time()
+    cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) 
+                VALUES(%s, %s, %s, %s, %s, %s)" % (src, dst, action, data, time, ip)
+    db.commit()
+
+
 def authenticate(session):
     """
         Authenticates a country from the given session
@@ -47,12 +63,19 @@ def authenticate(session):
         :returns status: status of the authentication, the cid if valid, None if invalid
     """
     cur = db.cursor()
-    cur.execute("SELECT cid FROM sessions WHERE sessionid='%s'" % (session))
-    cid = cur.fetchone()
-    if not cid:
+    cur.execute("SELECT cid, time FROM sessions WHERE sessionid='%s'" % (session))
+    result = cur.fetchone()
+    if not result:
         return None
-    else:
-        return int(cid[0])
+    
+    cid = int(result[0])
+    t = float(result[1])
+    cur_time = time.time()
+    diff_time = cur_time - t
+    if diff_time > 36000:
+        return "expired"
+    
+    return cid
 
 
 def check_ally(country1, country2):
@@ -150,21 +173,17 @@ def login():
                 % (country, password))
 
     cid = cur.fetchone()
-    print cid
     if not cid:
         return bad_auth()
     cid = int(cid[0])
     
-    # make random sessions, not hashing
-    m = hashlib.md5()
-    m.update(country+password)
-    session = m.hexdigest()
+    session = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
     t = time.time()
     ip = flask.request.remote_addr
     cur.execute("UPDATE sessions SET sessionid='%s', time='%s', ip='%s' WHERE cid=%s"
                 % (session, t, ip, cid))
     db.commit()
-
+    log_action(cid, '', 'Logged in', '', flask.request.remote_addr)
     return session
 
 
@@ -181,7 +200,10 @@ def get_name():
     cid = authenticate(session)
     if not cid:
         return bad_auth()
-    
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
+
     cur = db.cursor()
     cur.execute("SELECT countryname FROM users WHERE cid='%s'" % (cid))
     name = cur.fetchone()
@@ -206,6 +228,9 @@ def get_resources():
     cid = authenticate(session)
     if not cid:
         return bad_auth()
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
 
     cur = db.cursor()
     starting_resources = []
@@ -255,7 +280,10 @@ def get_allies():
         cid = authenticate(session)
         if not cid:
             return bad_auth()
-    
+        elif cid == 'expired':
+            status = {'False': 'Session expired'}
+            return jsonify(status)
+
     allies_json = {}
     allies_json['allies'] = []
     
@@ -295,7 +323,10 @@ def get_enemies():
         cid = authenticate(session)
         if not cid:
             return bad_auth()
-    
+        elif cid == 'expired':
+            status = {'False': 'Session expired'}
+            return jsonify(status)
+
     enemies_json = {}
     enemies_json['enemies'] = []
     
@@ -325,6 +356,9 @@ def add_ally():
     cid = authenticate(session)
     if not cid:
         return bad_auth()
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
 
     country_to_add = args['country']
     cur = db.cursor()
@@ -340,18 +374,20 @@ def add_ally():
         status = {'False': "Can't add yourself" }
         return jsonify(status)
 
-    cur.execute("UPDATE relations SET atpeace%s='1' WHERE cid='%s'" % (cid2, cid))
+    cur.execute("UPDATE relations SET atpeace%s='1' WHERE cid='%s'" % (cid2, cid)) 
+    cur.execute("UPDATE relations SET atwar%s='0' WHERE cid='%s'" % (cid2, cid))
     
     db.commit()
     
+    log_action(cid, cid2, 'Added ally', country_to_add, flask.request.remote_addr)
     status = {'True': '%s added as ally' % country_to_add}
     return jsonify(status)
 
 
-@app.route('/removeally', methods=['GET', 'POST'])
-def remove_ally():
+@app.route('/makeneutral', methods=['GET', 'POST'])
+def make_neutral():
     """
-        Handles request for removing an ally
+        Handles request for neutralizing a country
     
         :param session: the session of the country removing an ally
         :param country: the name of the country being removed
@@ -362,6 +398,9 @@ def remove_ally():
     cid = authenticate(session)
     if not cid:
         return bad_auth()
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
 
     country_to_remove = args['country']
     cur = db.cursor()
@@ -379,11 +418,9 @@ def remove_ally():
 
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid, cid2))
+    cur.execute("UPDATE relations SET atwar%s='0' WHERE cid='%s'" % (cid2, cid))
+    cur.execute("UPDATE relations SET atwar%s='0' WHERE cid='%s'" % (cid, cid2))
 
-    # also re randomize the code so the team can't just re enter it and steal it
-    # also need to make sure we check if the code even exists before randomizing and re entering
-    # could have been stolen during that time
-    
     for r in resources:
         # Check if remover is using a resource of the removee, if so remove it
         cur.execute("SELECT has_%s FROM acquired_resources WHERE cid='%s'" % (r, cid))
@@ -419,7 +456,8 @@ def remove_ally():
 
     db.commit()
     
-    status = {'True': '%s removed as an ally' % country_to_remove }
+    log_action(cid, cid2, 'Became neutral', country_to_remove, flask.request.remote_addr)
+    status = {'True': '%s became neutral' % country_to_remove }
     return jsonify(status)
 
 
@@ -438,6 +476,9 @@ def declare_war():
     cid = authenticate(session)
     if not cid:
         return bad_auth()
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
 
     country_to_attack = args['country']
     cur = db.cursor()
@@ -450,7 +491,7 @@ def declare_war():
 
     cid2 = int(cid2[0])
     if cid2 == cid:
-        status = {'True': 'Can not declare war against yourself' }
+        status = {'False': 'Can not declare war against yourself'}
         return jsonify(status)
 
     # add code to remove as ally 
@@ -458,8 +499,8 @@ def declare_war():
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
 
     db.commit()
-    status = {'True' : 'Declared war against %s' % country_to_attack }
-
+    status = {'True' : 'Declared war against %s' % country_to_attack } 
+    log_action(cid, cid2, 'declared war against', country_to_attack, flask.request.remote_addr)
     return jsonify(status)
 
 
@@ -475,9 +516,13 @@ def add_resource():
     args = flask.request.args
     cur = db.cursor()
     session = args['session']
+    country_to_share = args['country']
     cid = authenticate(session)
     if not cid:
         return bad_auth()
+    elif cid == 'expired':
+        status = {'False': 'Session expired'}
+        return jsonify(status)
 
     resource = args['resource']
     resource_owner, resource_type = check_resource(resource)
@@ -489,17 +534,38 @@ def add_resource():
         status = {'False': "Can't add your own resource"}
         return jsonify(status)
 
+    if country:
+        cur.execute("SELECT cid FROM users WHERE countryname='%s'" % country)
+        cid2 = cur.fetchone()
+        if not cid2:
+            status = {'False': '%s is not a country' % country}
+            return jsonify(status)
+
+        cid2 = int(cid2[0])
+        cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'"
+                    % (resource_type, resource, cid2))
+        db.commit()
+        status = {'True': '%s shared with %s' % (resource_type, country)}
+        log_action(cid, cid2, 'Shared resource with', country + ',' + resource_type, 
+                    flask.request.remote_addr)
+
+        return jsonify(status)
+
     status = check_ally(cid, resource_owner)
     if status:
         cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'" 
                     % (resource_type, resource, cid))
-    
+        log_action(cid, cid2, 'Added resource', country + ',' + resource_type, 
+                    flask.request.remote_addr)
+
     else:
         # need to remove the resource from people who are sharing it with that person too
         cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
                     % (resource_type, resource, cid))
         cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
                     % (resource_type, resource_owner))    
+        log_action(cid, cid2, 'Stole resource', country + ',' + resource_type, 
+                    flask.request.remote_addr)
     
     db.commit()       
 
