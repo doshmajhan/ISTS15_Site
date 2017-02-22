@@ -1,5 +1,11 @@
 <?php
 
+$team_settings = parse_ini_file("ists_settings.ini");
+$backend = $team_settings['apiip'];
+$scheme = $team_settings['apischeme'];
+$port = $team_settings['apiport'];
+$bank = $team_settings['bankapi'];
+
 function login($backend,$scheme,$port,$country,$password){
 	$ch = curl_init();
 	$fields = array(
@@ -247,21 +253,82 @@ function get_name($backend,$scheme,$port,$session){
 	return $response;
 }
 
+// if returns true it will return the resource it added
+function change_pass($cname,$bank,$session,$password){
+	$ch = curl_init();
+	$fields = array(
+		'countryname' => urlencode($cname),
+		'newPassword' => urlencode($password),
+		'session' => urlencode($session)
+	);
+	$fields_string = "";
+	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+	$fields_string = rtrim($fields_string, '&');
+	$url = $bank.'/changePassword';
 
-$backend = "184.73.151.60";
-$scheme = "http";
-$port = "5000";
-#$session = login($backend,$scheme,$port,"United States","password");
-//echo get_name($backend,$scheme,$port,$session);
-//get_res($backend,$scheme,$port,$session);
-//add_res($backend,$scheme,$port,$session,'GBZ658P9NJXXXFAW5FFVOEOXMSKV2Z')
-//add_ally($backend,$scheme,$port,$session,'Canada');
-//get_ally($backend,$scheme,$port,$session,"United States");
-//get_enemies($backend,$scheme,$port,$session,"United States");
-//remove_ally($backend,$scheme,$port,$session,'United States');
-//get_ally($backend,$scheme,$port,$session);
-//declare_war($backend,$scheme,$port,$session,'United States');
-//
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_URL,$url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
+
+	$response = curl_exec($ch); 
+	curl_close($ch);
+	$response = json_decode($response);
+	$response = json_decode(json_encode($response), True);	
+	return $response;
+}
+
+// if returns true it will return the resource it added
+function change_pin($cname,$bank,$session,$pin){
+	$ch = curl_init();
+	$fields = array(
+		'countryname' => urlencode($cname),
+		'newPin' => urlencode($pin),
+		'session' => urlencode($session)
+	);
+	$fields_string = "";
+	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+	$fields_string = rtrim($fields_string, '&');
+	$url = $bank.'/changePin';
+
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_URL,$url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
+
+	$response = curl_exec($ch); 
+	curl_close($ch);
+	$response = json_decode($response);
+	$response = json_decode(json_encode($response), True);	
+	return $response;
+}
+
+// if returns true it will return the resource it added
+function get_balance($cname,$bank,$session){
+	$ch = curl_init();
+	$fields = array(
+		'countryname' => urlencode($cname),
+		'session' => urlencode($session)
+	);
+	$fields_string = "";
+	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+	$fields_string = rtrim($fields_string, '&');
+	$url = $bank.'/getBalance';
+
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_URL,$url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
+
+	$response = curl_exec($ch); 
+	curl_close($ch);
+	$response = json_decode($response);
+	$response = json_decode(json_encode($response), True);	
+	return $response;
+}
 
 
 ?>
