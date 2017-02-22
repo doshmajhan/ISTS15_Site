@@ -3,7 +3,7 @@
 		if(!isset($_SESSION)){session_start();}
 		if(!isset($_SESSION['logged_in'])) { 
 			$page_name = basename($_SERVER['PHP_SELF']);
-			$disallowed = array("ists_conflicts.php","ists_map.php","ists_resources.php");
+			$disallowed = array("ists_conflicts.php","ists_map.php","ists_resources.php","ists_balance.php","ists_trans.php","ists_settings.php","ists_store.php");
 			if(in_array($page_name,$disallowed)){
 				$host  = $_SERVER['HTTP_HOST'];
 				$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -38,6 +38,7 @@
 						<li><a id="menu_about" href="ists_about.php">About</a></li>\
 						<li><a id="menu_settings" href="ists_settings.php">Change Setting</a></li>\
 						<li><a id="menu_trans" href="ists_trans.php">Transaction History</a></li>\
+						<li><a id="menu_store" href="ists_store.php">Store</a></li>\
 						<li><a id="menu_balance" href="ists_balance.php">Check Balance</a></li>';	
 		var title = document.getElementsByTagName("title")[0].innerHTML.toLowerCase();
 			
@@ -92,6 +93,9 @@
 				}	
 				if(title.search("about") > -1){
 					$("#menu_about").addClass("menuul_active");
+				}			
+				if(title.search("store") > -1){
+					$("#menu_store").addClass("menuul_active");
 				}					
 				$("#splash").hide();
 				$(document.body).on('click', 'a' ,function(e){
