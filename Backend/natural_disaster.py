@@ -1,5 +1,5 @@
+import MySQLdb
 import random
-import resource_poller
 import time
 
 disaster_list = {
@@ -18,6 +18,46 @@ disaster_count = {
                     'depression': 0
                  }
 
+resources = ['water', 'food', 'gas', 'electricity', 'luxury']
+
+def connect_db():
+    """
+        Connects to our MySQL database
+
+        :return db: the object for our database connection
+    """
+    db = MySQLdb.connect(host='localhost', user='root', 
+                         passwd='con162ess', db='ists')
+    return db
+
+
+def poll(cid, resource):
+    """
+        Checks each teams resources to see if they have the resource
+        for the current natural disaster
+    
+        :param cid: the cid of the country to poll
+        :param resource: the resource they need to have
+    """
+    cur = db.cursor()
+
+    for r in resources:
+        cur.execute("SELECT has_%s FROM starting_resources WHERE cid='%s'" %
+                    (r, cid))
+        code = cur.fetchone()
+        if code[0] != "0":
+            if r == resource:
+                return True
+        
+        cur.execute("SELECT has_%s FROM acquired_resources WHERE cid='%s'" %
+                    (r, cid))
+        code = cur.fetchone()
+        if code[0] != "0":
+            if r == resource:
+                return True
+
+    return False
+
 
 def pick_disaster():
     """ 
@@ -33,12 +73,40 @@ def pick_disaster():
     return current_disaster
 
 
-if __name__ == '__main__':
-    while True:
-        current_disaster = pick_disaster()
-        resource = disaster_list[current_disaster]
-        for cid in range(1, 11):
-            #resource_poller.poll(cid, resource)
-            print "Polling %d, %s" % (cid, resource)
+def hit_team(cid):
+    """
+        Subtract money from a teams account since they didn't have the resource
 
+        :param cid: the cid of the country to 
+    """
+    cur = db.cursor()
+    cur.execute("SELECT balance FROM users WHERE cid='%s'" % (cid))
+    balance = cur.fetchone()
+    balance = float(balance[0])
+    balance = balance - 10
+    cur.execute("UPDATE users SET balance='%s' WHERE cid='%s'" %
+                (balance, cid))
+    db.commit()
+    print "%s new balance: %s" % (str(cid), str(balance))
+
+
+def poll_teams(disaster):
+    """
+        Polls teams to see if they have the resource for the disaster
+
+        :param disaster: the current disaster hitting
+    """
+    resource = disaster_list[disaster]
+    for cid in range(1, 11):
+        check = poll(cid, resource)
+        print "Polling %d, %s | Result - %r" % (cid, resource, check)
+        if not check:
+            hit_team(cid)
+
+if __name__ == '__main__':
+    db = connect_db()
+    while True
+        current_disaster = pick_disaster()
+        poll_teams(current_disaster)
         time.sleep(2)
+

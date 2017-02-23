@@ -50,8 +50,8 @@ def log_action(src, dst, action, data, ip):
     """
     cur = db.cursor()
     t = time.time()
-    cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) 
-                VALUES(%s, %s, %s, %s, %s, %s)" % (src, dst, action, data, time, ip)
+    cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) " \
+                "VALUES('%s', '%s', '%s', '%s', '%s', '%s')" % (src, dst, action, data, t, ip))
     db.commit()
 
 
@@ -73,6 +73,7 @@ def authenticate(session):
     cur_time = time.time()
     diff_time = cur_time - t
     if diff_time > 36000:
+        print "expired"
         return "expired"
     
     return cid
@@ -183,8 +184,38 @@ def login():
     cur.execute("UPDATE sessions SET sessionid='%s', time='%s', ip='%s' WHERE cid=%s"
                 % (session, t, ip, cid))
     db.commit()
-    log_action(cid, '', 'Logged in', '', flask.request.remote_addr)
+    log_action(cid, 0, 'Logged in', 'none', flask.request.remote_addr)
     return session
+
+
+@app.route("/authenticate", methods=['GET'])
+def authenticate_endpoint():
+    """
+        Authenticates a country from the given session
+
+        :param session: the session variable submitted in the request
+        :returns status: status of the authentication, the cid if valid, None if invalid
+    """
+    args = flask.request.args
+    session = args['session']
+    if not session:
+        status = {'False': 'No session'}
+        return jsonify(status)
+
+    cur = db.cursor()
+    cur.execute("SELECT cid, time FROM sessions WHERE sessionid='%s'" % (session))
+    result = cur.fetchone()
+    if not result:
+        return jsonify({'False': 'Bad session'})
+    
+    cid = int(result[0])
+    t = float(result[1])
+    cur_time = time.time()
+    diff_time = cur_time - t
+    if diff_time > 36000:
+        return jsonify({'False': 'Session expired'})
+    
+    return str(cid)
 
 
 @app.route('/getname', methods=['GET'])
@@ -373,6 +404,18 @@ def add_ally():
     if cid == cid2:
         status = {'False': "Can't add yourself" }
         return jsonify(status)
+    
+    count = 0
+    for x in range(1, 12):
+        cur.execute("SELECT atpeace%s FROM relations WHERE cid='%s'" % (x, cid))
+        relation = cur.fetchone()
+        relation = int(relation[0])
+        if relation:
+            count += 1
+        if count >= 2:
+            status = {'False': "Can't have more than 2 allies" }
+            return jsonify(status)
+    
 
     cur.execute("UPDATE relations SET atpeace%s='1' WHERE cid='%s'" % (cid2, cid)) 
     cur.execute("UPDATE relations SET atwar%s='0' WHERE cid='%s'" % (cid2, cid))
@@ -494,9 +537,10 @@ def declare_war():
         status = {'False': 'Can not declare war against yourself'}
         return jsonify(status)
 
-    # add code to remove as ally 
     cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid2, cid))
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
+    cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid, cid2))
+    cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid, cid2))
 
     db.commit()
     status = {'True' : 'Declared war against %s' % country_to_attack } 
