@@ -58,7 +58,7 @@ INSERT INTO `acquired_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 --
 
 CREATE TABLE `auditing` (
-  `aid` int(16) DEFAULT NULL,
+  `aid` int(16) NOT NULL AUTO_INCREMENT,
   `cidsrc` int(16) NOT NULL,
   `ciddst` int(16) NOT NULL,
   `action` varchar(255) NOT NULL,

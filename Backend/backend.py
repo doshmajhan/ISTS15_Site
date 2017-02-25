@@ -134,6 +134,66 @@ def check_resource(resource):
     return (None, None)
 
 
+def check_number_of_shares(cid, cid2):
+    """
+        Checks the number of resources shared from cid to cid2
+
+        :param cid: the cid of the country sharing the resource
+        :param cid2: the cid of the country getting the shared resource
+        :return check: true if they haven't shared a resource yet, false if they have
+    """
+    cur = db.cursor()
+    
+    for r in resources:
+        cur.execute("SELECT has_%s FROM starting_resources WHERE cid='%s'" % (r, cid))
+        owned_resource = cur.fetchone()[0]
+        if owned_resource == "0":
+            continue
+        
+        cur.execute("SELECT has_%s FROM acquired_resources WHERE cid='%s'" % (r, cid2))
+        shared_resource = cur.fetchone()[0]
+        if shared_resource == "0":
+            continue
+
+        if owned_resource == shared_resource:
+            return False
+
+    return True
+
+
+def resource_stolen(resource_type, code, cid, owner):
+    """
+        Handles when a resource is stolen from a country
+        It will update the country who stole it with the code
+        The country who was stolen from will lose it
+        All the countries who shared it with the person who stole it will also lose it
+
+        :param resource_type: the type of the resource being stolen
+        :param code: the code for the stolen resource
+        :param cid: the cid of the country stealing the resource
+        :param owner: the owner of the resource being stolen
+
+    """
+    cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
+                % (resource_type, resource, cid))
+    cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
+                % (resource_type, resource_owner)) 
+
+    country_list = [x for x in range(1, 11) if x != cid]
+    for c in country_list:
+        cur.execute("SELECT cid FROM acquired_resources WHERE has_%s='%s'" %
+                    (resource_type, code))
+
+        sharer = cur.fetchone()
+        if not sharer:
+            continue
+        
+        cur.execute("UPDATE acquired_resources SET has_%s='0' WHERE cid='%s'" %
+                    (resource_type, c))
+
+    db.commit()
+
+
 def randomize_resource(resource, cid, old_code):
     """
         Re randomizes the resource of a given country after they have removed an ally
@@ -584,8 +644,15 @@ def add_resource():
         if not cid2:
             status = {'False': '%s is not a country' % country}
             return jsonify(status)
-
+            
         cid2 = int(cid2[0])
+        
+        if not check_number_of_shares(cid, cid2):
+            status = {'False': "Can't share more than one resource with an ally"}
+            log_action(cid, cid2, 'Tried to share more than one reource',
+                        country + ',' + resource_type, flask.request_remote_addr)
+            return jsonify(status)
+
         cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'"
                     % (resource_type, resource, cid2))
         db.commit()
@@ -603,11 +670,7 @@ def add_resource():
                     flask.request.remote_addr)
 
     else:
-        # need to remove the resource from people who are sharing it with that person too
-        cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
-                    % (resource_type, resource, cid))
-        cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
-                    % (resource_type, resource_owner))    
+        resource_stolen(resource_type, resource, cid, resource_owner) 
         log_action(cid, cid2, 'Stole resource', country + ',' + resource_type, 
                     flask.request.remote_addr)
     
