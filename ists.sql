@@ -10,7 +10,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -58,7 +57,7 @@ INSERT INTO `acquired_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 --
 
 CREATE TABLE `auditing` (
-  `aid` int(16) NOT NULL AUTO_INCREMENT,
+  `aid` int(16) NOT NULL,
   `cidsrc` int(16) NOT NULL,
   `ciddst` int(16) NOT NULL,
   `action` varchar(255) NOT NULL,
@@ -94,7 +93,7 @@ CREATE TABLE `relations` (
   `atpeace7` int(1) NOT NULL DEFAULT '0',
   `atpeace8` int(1) NOT NULL DEFAULT '0',
   `atpeace9` int(1) NOT NULL DEFAULT '0',
-  `atpeace10` int(1) NOT NULL DEFAULT '0',
+  `atpeace10` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -102,16 +101,16 @@ CREATE TABLE `relations` (
 --
 
 INSERT INTO `relations` (`cid`, `atwar1`, `atwar2`, `atwar3`, `atwar4`, `atwar5`, `atwar6`, `atwar7`, `atwar8`, `atwar9`, `atwar10`, `atpeace1`, `atpeace2`, `atpeace3`, `atpeace4`, `atpeace5`, `atpeace6`, `atpeace7`, `atpeace8`, `atpeace9`, `atpeace10`) VALUES
-(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -140,7 +139,7 @@ INSERT INTO `sessions` (`cid`, `sessionid`, `time`, `ip`) VALUES
 (7, 'invalid', NULL, NULL),
 (8, 'invalid', NULL, NULL),
 (9, 'invalid', NULL, NULL),
-(10, 'invalid', NULL, NULL),
+(10, 'invalid', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -171,7 +170,7 @@ INSERT INTO `starting_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 (7, '0', '0', '0', '0', '0'),
 (8, '0', '0', '0', '0', '0'),
 (9, '0', '0', '0', '0', '0'),
-(10, '0', '0', '0', '0', '0'),
+(10, '0', '0', '0', '0', '0');
 
 -- --------------------------------------------------------
 
@@ -202,12 +201,15 @@ INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, 
 (7, 'Jamaica', 'password', 7, 10000, 0),
 (8, 'Germany', 'password', 8, 10000, 0),
 (9, 'Finland', 'password', 9, 10000, 0),
-(10, 'India', 'password', 10, 10000, 0),
+(10, 'India', 'password', 10, 10000, 0);
 
 --
 -- Indexes for dumped tables
 --
 
+ALTER TABLE `auditing`
+  ADD PRIMARY KEY (`aid`),
+  MODIFY COLUMN `aid` INT AUTO_INCREMENT;
 --
 -- Indexes for table `acquired_resources`
 --
