@@ -17,18 +17,17 @@ function loadDisaster(url) {
 }
 
 
-// 10 minutes from now
-var time_in_minutes = 10;
-var current_time = Date.parse(new Date());
-var deadline = new Date(current_time + time_in_minutes*60*1000);
-
-// variables for time units
-var minutes, seconds;
- 
  
 // update the tag with id "countdown" every 1 second
 function ticktock(){
-    var check = true;
+    // 10 minutes from now
+    var time_in_minutes = 10;
+    var current_time = Date.parse(new Date());
+    var deadline = new Date(current_time + time_in_minutes*60*1000);
+
+    // variables for time units
+    var minutes, seconds;
+
     var inter = setInterval(function() { 
         var countdown = document.getElementById("countdown");
         // find the amount of "seconds" between now and target
@@ -37,10 +36,8 @@ function ticktock(){
      
         minutes = parseInt(seconds_left / 60);
         seconds = parseInt(seconds_left % 60);
-        // format countdown string + set tag value
         countdown.innerHTML = '<span class="minutes">' + minutes + ' <b>Minutes</b></span> <span class="seconds">' + seconds + ' <b>Seconds</b></span>';  
         if(minutes == 0 && seconds == 0){
-            //clearInterval(tick); 
             console.log("clear");
             clearInterval(inter);
         }
