@@ -1,5 +1,17 @@
 	<?php
 		$team_settings = parse_ini_file("ists_settings.ini");
+		if(!isset($_SESSION)){session_start();}
+		if(!isset($_SESSION['logged_in'])) { 
+			$page_name = basename($_SERVER['PHP_SELF']);
+			$disallowed = array("ists_conflicts.php","ists_map.php","ists_resources.php","ists_balance.php","ists_trans.php","ists_settings.php","ists_store.php");
+			if(in_array($page_name,$disallowed)){
+				$host  = $_SERVER['HTTP_HOST'];
+				$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+				$extra = 'ists_login.php';  // change accordingly
+				header("Location: http://$host$uri/$extra");
+				exit;
+			}
+		}
 		include_once('api_calls.php');
 	?>
 	<link rel="stylesheet" type="text/css" href="istscss.php?teamname=<?php echo $team_settings['name']; ?>">
@@ -22,10 +34,12 @@
 						<li id="menu_conflicts"><a id="conflicts" href="/ists_conflicts.php">World Conflicts</a></li>\
 						<li id="menu_scoreboard"><a id="sboard" href="/ists_scoreboard.php">Scoreboard</a></li>';
 						
-		var fin_list = '<li><a id="home" href="ists_fin.php">Home</a></li>\
-						<li><a id="resources" href="ists2_fin.php">About</a></li>\
-						<li><a id="x" href="ists2_fin.php">Pay Bills</a></li>\
-						<li><a id="allies" href="ists2_fin.php">Check Balance</a></li>';	
+		var fin_list = '<li><a id="menu_home" href="ists.php">Home</a></li>\
+						<li><a id="menu_about" href="ists_about.php">About</a></li>\
+						<li><a id="menu_settings" href="ists_settings.php">Change Setting</a></li>\
+						<li><a id="menu_trans" href="ists_trans.php">Transaction History</a></li>\
+						<li><a id="menu_store" href="ists_store.php">Store</a></li>\
+						<li><a id="menu_balance" href="ists_balance.php">Check Balance</a></li>';	
 		var title = document.getElementsByTagName("title")[0].innerHTML.toLowerCase();
 			
 		$( document ).ready(function() {
@@ -67,7 +81,22 @@
 				}						
 				if(title.search("scoreboard") > -1){
 					$("#menu_scoreboard").addClass("menuul_active");
+				}
+				if(title.search("balance") > -1){
+					$("#menu_balance").addClass("menuul_active");
+				}					
+				if(title.search("transaction") > -1){
+					$("#menu_trans").addClass("menuul_active");
 				}	
+				if(title.search("settings") > -1){
+					$("#menu_settings").addClass("menuul_active");
+				}	
+				if(title.search("about") > -1){
+					$("#menu_about").addClass("menuul_active");
+				}			
+				if(title.search("store") > -1){
+					$("#menu_store").addClass("menuul_active");
+				}					
 				$("#splash").hide();
 				$(document.body).on('click', 'a' ,function(e){
 					e.preventDefault();

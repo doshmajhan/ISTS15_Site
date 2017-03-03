@@ -50,8 +50,8 @@ def log_action(src, dst, action, data, ip):
     """
     cur = db.cursor()
     t = time.time()
-    cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) 
-                VALUES(%s, %s, %s, %s, %s, %s)" % (src, dst, action, data, time, ip)
+    cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) " \
+                "VALUES('%s', '%s', '%s', '%s', '%s', '%s')" % (src, dst, action, data, t, ip))
     db.commit()
 
 
@@ -73,6 +73,7 @@ def authenticate(session):
     cur_time = time.time()
     diff_time = cur_time - t
     if diff_time > 36000:
+        print "expired"
         return "expired"
     
     return cid
@@ -133,6 +134,66 @@ def check_resource(resource):
     return (None, None)
 
 
+def check_number_of_shares(cid, cid2):
+    """
+        Checks the number of resources shared from cid to cid2
+
+        :param cid: the cid of the country sharing the resource
+        :param cid2: the cid of the country getting the shared resource
+        :return check: true if they haven't shared a resource yet, false if they have
+    """
+    cur = db.cursor()
+    
+    for r in resources:
+        cur.execute("SELECT has_%s FROM starting_resources WHERE cid='%s'" % (r, cid))
+        owned_resource = cur.fetchone()[0]
+        if owned_resource == "0":
+            continue
+        
+        cur.execute("SELECT has_%s FROM acquired_resources WHERE cid='%s'" % (r, cid2))
+        shared_resource = cur.fetchone()[0]
+        if shared_resource == "0":
+            continue
+
+        if owned_resource == shared_resource:
+            return False
+
+    return True
+
+
+def resource_stolen(resource_type, code, cid, owner):
+    """
+        Handles when a resource is stolen from a country
+        It will update the country who stole it with the code
+        The country who was stolen from will lose it
+        All the countries who shared it with the person who stole it will also lose it
+
+        :param resource_type: the type of the resource being stolen
+        :param code: the code for the stolen resource
+        :param cid: the cid of the country stealing the resource
+        :param owner: the owner of the resource being stolen
+
+    """
+    cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
+                % (resource_type, resource, cid))
+    cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
+                % (resource_type, resource_owner)) 
+
+    country_list = [x for x in range(1, 11) if x != cid]
+    for c in country_list:
+        cur.execute("SELECT cid FROM acquired_resources WHERE has_%s='%s'" %
+                    (resource_type, code))
+
+        sharer = cur.fetchone()
+        if not sharer:
+            continue
+        
+        cur.execute("UPDATE acquired_resources SET has_%s='0' WHERE cid='%s'" %
+                    (resource_type, c))
+
+    db.commit()
+
+
 def randomize_resource(resource, cid, old_code):
     """
         Re randomizes the resource of a given country after they have removed an ally
@@ -183,8 +244,38 @@ def login():
     cur.execute("UPDATE sessions SET sessionid='%s', time='%s', ip='%s' WHERE cid=%s"
                 % (session, t, ip, cid))
     db.commit()
-    log_action(cid, '', 'Logged in', '', flask.request.remote_addr)
+    log_action(cid, 0, 'Logged in', 'none', flask.request.remote_addr)
     return session
+
+
+@app.route("/authenticate", methods=['GET'])
+def authenticate_endpoint():
+    """
+        Authenticates a country from the given session
+
+        :param session: the session variable submitted in the request
+        :returns status: status of the authentication, the cid if valid, None if invalid
+    """
+    args = flask.request.args
+    session = args['session']
+    if not session:
+        status = {'False': 'No session'}
+        return jsonify(status)
+
+    cur = db.cursor()
+    cur.execute("SELECT cid, time FROM sessions WHERE sessionid='%s'" % (session))
+    result = cur.fetchone()
+    if not result:
+        return jsonify({'False': 'Bad session'})
+    
+    cid = int(result[0])
+    t = float(result[1])
+    cur_time = time.time()
+    diff_time = cur_time - t
+    if diff_time > 36000:
+        return jsonify({'False': 'Session expired'})
+    
+    return str(cid)
 
 
 @app.route('/getname', methods=['GET'])
@@ -373,6 +464,18 @@ def add_ally():
     if cid == cid2:
         status = {'False': "Can't add yourself" }
         return jsonify(status)
+    
+    count = 0
+    for x in range(1, 12):
+        cur.execute("SELECT atpeace%s FROM relations WHERE cid='%s'" % (x, cid))
+        relation = cur.fetchone()
+        relation = int(relation[0])
+        if relation:
+            count += 1
+        if count >= 2:
+            status = {'False': "Can't have more than 2 allies" }
+            return jsonify(status)
+    
 
     cur.execute("UPDATE relations SET atpeace%s='1' WHERE cid='%s'" % (cid2, cid)) 
     cur.execute("UPDATE relations SET atwar%s='0' WHERE cid='%s'" % (cid2, cid))
@@ -494,9 +597,10 @@ def declare_war():
         status = {'False': 'Can not declare war against yourself'}
         return jsonify(status)
 
-    # add code to remove as ally 
     cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid2, cid))
     cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid2, cid))
+    cur.execute("UPDATE relations SET atwar%s='1' WHERE cid='%s'" % (cid, cid2))
+    cur.execute("UPDATE relations SET atpeace%s='0' WHERE cid='%s'" % (cid, cid2))
 
     db.commit()
     status = {'True' : 'Declared war against %s' % country_to_attack } 
@@ -540,8 +644,15 @@ def add_resource():
         if not cid2:
             status = {'False': '%s is not a country' % country}
             return jsonify(status)
-
+            
         cid2 = int(cid2[0])
+        
+        if not check_number_of_shares(cid, cid2):
+            status = {'False': "Can't share more than one resource with an ally"}
+            log_action(cid, cid2, 'Tried to share more than one reource',
+                        country + ',' + resource_type, flask.request_remote_addr)
+            return jsonify(status)
+
         cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'"
                     % (resource_type, resource, cid2))
         db.commit()
@@ -559,11 +670,7 @@ def add_resource():
                     flask.request.remote_addr)
 
     else:
-        # need to remove the resource from people who are sharing it with that person too
-        cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
-                    % (resource_type, resource, cid))
-        cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
-                    % (resource_type, resource_owner))    
+        resource_stolen(resource_type, resource, cid, resource_owner) 
         log_action(cid, cid2, 'Stole resource', country + ',' + resource_type, 
                     flask.request.remote_addr)
     

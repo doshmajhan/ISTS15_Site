@@ -1,12 +1,16 @@
 <?php 
+if(!isset($_SESSION)) { session_start(); }	
+if(!isset($_SESSION)){
+	die();
+}
 if(!isset($_GET['country'])){
 	exit("We didn't get the arguments we expected");
 }
 include_once('api_calls.php');
 $country = htmlspecialchars($_GET['country'],ENT_QUOTES | ENT_HTML5, 'UTF-8');
 $countries = array('Australia','Brazil','Canada','China','United Kingdom','Germany','India','Japan','Russia','South Africa','United States');
-$allies = get_ally($backend,$scheme,$port,$session,$country);
-$enemies = get_enemies($backend,$scheme,$port,$session,$country);
+$allies = get_ally($backend,$scheme,$port,$_SESSION['session'],$country);
+$enemies = get_enemies($backend,$scheme,$port,$_SESSION['session'],$country);
 if(($key = array_search($country, $countries)) !== false) {
 	unset($countries[$key]);
 }	

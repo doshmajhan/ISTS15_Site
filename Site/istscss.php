@@ -102,7 +102,7 @@ body {
 	height: 400px;
 	margin: 0;
 	background: black;
-	background: linear-gradient(to right,rgba(0,0,0, 100)60%,rgba(0,0,0, 0)),url(images/<?php echo $_GET['teamname']; ?>.png);
+	background: linear-gradient(to right,rgba(0,0,0, 100)60%,rgba(0,0,0, 0)),url(images/<?php echo strtolower($_GET['teamname']); ?>.png);
 
 	background-position: right;
 }
@@ -195,6 +195,14 @@ body {
 	color: white;
 }
 
+#sign_table{
+	position: relative;
+	border-collapse: collapse;
+    margin-left:auto; 
+    margin-right:auto;	
+	
+}
+
 .conflict_text{
 	color:white;
 }
@@ -279,6 +287,7 @@ body {
 	left: 30%;
 	margin-top: -14%;
 	min-height: 100%;
+	color: white;
 }
 #footer {
 	position: relative;

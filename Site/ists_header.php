@@ -14,7 +14,16 @@
 				Financial Services
 			</td>
 			<td id="login">
-				<a href="ists_login.php">Log In</a>
+				<?php
+					include_once('ists_includes.php');
+					if(isset($_SESSION['logged_in']) and $_SESSION['logged_in'] === "TRUE"){
+						echo "Welcome " . get_name($backend,$scheme,$port,$_SESSION['session']);
+						echo ', <a id="logout" href="ists_logout.php">Log Out</a>';
+					}else{
+						echo '<a id="login" href="ists_login.php">Log In</a>';
+					}
+				?>
+				
 			</td>
 			</tr>
 			</table>

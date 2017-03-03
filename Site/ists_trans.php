@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>ISTS - Conflicts</title>
+	<title>ISTS Finance - Transaction History</title>
 	<?php
 		include_once('ists_includes.php');
 	?>
@@ -39,7 +39,7 @@
 	?>
 	<div id="content">
 		<div id="title">
-			<table><td><img src="images/icons/conflict.png" class="title_icon" /></td><td id="titletext">Conflicts</td></table></div>
+			<table><td><img src="images/icons/trans.png" class="title_icon" /></td><td style="width:400px;" id="titletext">Transaction History</td></table></div>
 		</div>
 		<div id="data">
 

@@ -6,17 +6,17 @@
 	?>
 <script>
 <?php
-$country = get_name($backend,$scheme,$port,$session);
+$country = get_name($backend,$scheme,$port,$_SESSION['session']);
 
-$countryAck = array('AU','BR','CA','CN','GB','DE','IN','JP','RU','ZA','US');
+$countryAck = array('AU','BR','CA','CN','GB','DE','IN','RU','ZA','US');
 $allowedCountries = "";
 foreach($countryAck as $value){
 	$allowedCountries .= "\"".$value."\",";
 }
 $allowedCountries = rtrim($allowedCountries,',');
-$countries = array('Australia','Brazil','Canada','China','United Kingdom','Germany','India','Japan','Russia','South Africa','United States');
-$allies = get_ally($backend,$scheme,$port,$session,$country);
-$enemies = get_enemies($backend,$scheme,$port,$session,$country);
+$countries = array('Australia','Brazil','Canada','China','United Kingdom','Germany','India','Russia','South Africa','United States');
+$allies = get_ally($backend,$scheme,$port,$_SESSION['session'],$country);
+$enemies = get_enemies($backend,$scheme,$port,$_SESSION['session'],$country);
 
 $status = "";
 $index = array_search($country, $countries);
