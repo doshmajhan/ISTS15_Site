@@ -192,17 +192,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, `pin`) VALUES
-(1, 'United States', 'password', 1, 10000, 0001),
-(2, 'Canada', 'password', 2, 10000, 0002),
-(3, 'United Kingdom', 'password', 3, 10000, 0003),
-(4, 'Russia', 'password', 4, 10000, 0004),
-(5, 'China', 'password', 5, 10000, 0005),
-(6, 'South Korea', 'password', 6, 10000, 0006),
-(7, 'Jamaica', 'password', 7, 10000, 0007),
-(8, 'Germany', 'password', 8, 10000, 0008),
-(9, 'Finland', 'password', 9, 10000, 0009),
-(10, 'India', 'password', 10, 10000, 0010),
-(111, 'ATM', 'ATM_IS_COOL', 1337, '0', '0');
+(1, 'United States', 'password', 0801256325, 10000, 2913),
+(2, 'Canada', 'password', 9531494373, 10000, 6871),
+(3, 'United Kingdom', 'password', 7048811450, 10000, 6464),
+(4, 'Russia', 'password', 7460413969, 10000, 4468),
+(5, 'China', 'password', 8871302371, 10000, 6355),
+(6, 'South Korea', 'password', 1837375547, 10000, 0852),
+(7, 'Jamaica', 'password', 6585102787, 10000, 7709),
+(8, 'Germany', 'password', 8770266532, 10000, 7274),
+(9, 'Finland', 'password', 5334292398, 10000, 3239),
+(10, 'India', 'password', 5605213540, 10000, 0151),
+(111, 'ATM', 'ATM_IS_COOL', 1337, '0', '0'),
+(1337, 'Red Team', 'horsebatteryists15variable', 7862105372, 10000, 5499);
 
 --
 -- Indexes for dumped tables
