@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `ists`
 --
-
+use ists;
 -- --------------------------------------------------------
 
 --
@@ -192,16 +192,17 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, `pin`) VALUES
-(1, 'United States', 'password', 1, 10000, 0),
-(2, 'Canada', 'password', 2, 10000, 0),
-(3, 'United Kingdom', 'password', 3, 10000, 0),
-(4, 'Russia', 'password', 4, 10000, 0),
-(5, 'China', 'password', 5, 10000, 0),
-(6, 'South Korea', 'password', 6, 10000, 0),
-(7, 'Jamaica', 'password', 7, 10000, 0),
-(8, 'Germany', 'password', 8, 10000, 0),
-(9, 'Finland', 'password', 9, 10000, 0),
-(10, 'India', 'password', 10, 10000, 0);
+(1, 'United States', 'password', 1, 10000, 0001),
+(2, 'Canada', 'password', 2, 10000, 0002),
+(3, 'United Kingdom', 'password', 3, 10000, 0003),
+(4, 'Russia', 'password', 4, 10000, 0004),
+(5, 'China', 'password', 5, 10000, 0005),
+(6, 'South Korea', 'password', 6, 10000, 0006),
+(7, 'Jamaica', 'password', 7, 10000, 0007),
+(8, 'Germany', 'password', 8, 10000, 0008),
+(9, 'Finland', 'password', 9, 10000, 0009),
+(10, 'India', 'password', 10, 10000, 0010),
+(111, 'ATM', 'ATM_IS_COOL', 1337, '0', '0');
 
 --
 -- Indexes for dumped tables

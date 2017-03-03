@@ -620,7 +620,7 @@ def add_resource():
     args = flask.request.args
     cur = db.cursor()
     session = args['session']
-    country_to_share = args['country']
+    country = args['country']
     cid = authenticate(session)
     if not cid:
         return bad_auth()
@@ -634,10 +634,6 @@ def add_resource():
         status = {'False': 'Bad resource code'}
         return jsonify(status)
 
-    if resource_owner == cid:
-        status = {'False': "Can't add your own resource"}
-        return jsonify(status)
-
     if country:
         cur.execute("SELECT cid FROM users WHERE countryname='%s'" % country)
         cid2 = cur.fetchone()
@@ -646,11 +642,14 @@ def add_resource():
             return jsonify(status)
             
         cid2 = int(cid2[0])
-        
+        if cid2 == cid:
+            status = {'False': "Can't add your own resource"}
+            return jsonify(status)
+
         if not check_number_of_shares(cid, cid2):
             status = {'False': "Can't share more than one resource with an ally"}
             log_action(cid, cid2, 'Tried to share more than one reource',
-                        country + ',' + resource_type, flask.request_remote_addr)
+                        country + ',' + resource_type, flask.request.remote_addr)
             return jsonify(status)
 
         cur.execute("UPDATE acquired_resources SET has_%s='%s' WHERE cid='%s'"
@@ -660,6 +659,10 @@ def add_resource():
         log_action(cid, cid2, 'Shared resource with', country + ',' + resource_type, 
                     flask.request.remote_addr)
 
+        return jsonify(status)
+
+    if resource_owner == cid:
+        status = {'False': "Can't add your own resource"}
         return jsonify(status)
 
     status = check_ally(cid, resource_owner)
