@@ -330,5 +330,32 @@ function get_balance($cname,$bank,$session){
 	return $response;
 }
 
+function add_res_country($backend,$scheme,$port,$session,$resource_code,$country){
+	$ch = curl_init();
+	$fields = array(
+		'session' => urlencode($session),
+		'resource' => urlencode($resource_code),
+		'country' => urlencode($country)
+	);
+	$fields_string = "";
+	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+	$fields_string = rtrim($fields_string, '&');
+	$fields_string = '?' . $fields_string;
+	$url = $scheme.'://'.$backend.':'.$port.'/addresource' . $fields_string;
+
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_URL,$url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+	$response = curl_exec($ch); 
+	curl_close($ch);
+	$response = json_decode($response);
+	$response = json_decode(json_encode($response), True);
+	# Check if it is an array;
+	if(!is_array($response)){
+		exit("Error: We didn't get the response we expected");		
+	}
+	return $response;
+}
 
 ?>

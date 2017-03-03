@@ -104,9 +104,15 @@ def poll_teams(disaster):
             hit_team(cid)
 
 if __name__ == '__main__':
-    db = connect_db()
-    while True
+    while True:
+        f = open('disaster.txt', 'w+')
         current_disaster = pick_disaster()
-        poll_teams(current_disaster)
-        time.sleep(2)
+        print current_disaster
+        f.write(str(current_disaster))
+        resource = disaster_list[current_disaster]
+        #for cid in range(1, 11):
+            #resource_poller.poll(cid, resource)
+            #print "Polling %d, %s" % (cid, resource)
+        f.close()
+        time.sleep(10)
 

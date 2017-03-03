@@ -23,6 +23,33 @@
 				}
 			});		
 		});
+		var country_name = "";
+		$( "#country_select" ).change(function () {
+			var str = "";
+			$( "select option:selected" ).each(function() {
+				country_name = $( this ).text();		
+			});
+		}).change();		
+		$( "#resShare" ).submit(function( event ) {
+			event.preventDefault();	
+			$( "#resresult" ).html( "Attempting to Share... Please Wait!" );
+			$.get( "share_code.php?"+$("#resShare").serialize(), function( data ) {
+				if(data != "TRUE"){
+					
+					$( "#resresult" ).html( data );
+
+
+				}else{
+					$( "#resresult" ).html( "You have succesfully shared your resource." );
+				}
+				setTimeout(
+					function() 
+					{
+						$( "#resresult" ).html( "" );
+				}, 5000);				
+			});		
+		});		
+		
 	});
 	</script>
 </head>
@@ -72,10 +99,31 @@
 				<div id="water" style="display:none;width:500px;">
 					<h2>Water</h2>
 					<p>
+					Add new paragraph
 						<?php 
-						if($res['water'] != ""){echo $res['water'];}
+						if($res['water'] != ""){
+							echo '
+							<div style="color:red;" id="resresult"></div>
+							Share Resource with:
+							<form id="resShare">
+							<select name="country" id="country_select">
+							  <option>Australia</option>
+							  <option>Brazil</option>
+							  <option>Canada</option>
+							  <option>China</option>
+							  <option>United Kingdom</option>
+							  <option>Germany</option>
+							  <option>India</option>
+							  <option>Japan</option>				  
+							  <option>Russia</option>
+							  <option>South Africa</option>
+							  <option>United States</option>
+							</select>
+							<input type="hidden" name="code" value="' . $res['water'] . '" /><input type="submit"></form>
+							';
+						}
 						?> 
-						Add new paragraph</a>
+						
 					</p>
 				</div>
 				</td>
