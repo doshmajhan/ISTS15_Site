@@ -35,10 +35,13 @@ def pick_disaster():
 
 if __name__ == '__main__':
     while True:
+        f = open('disaster.txt', 'w+')
         current_disaster = pick_disaster()
+        print current_disaster
+        f.write(str(current_disaster))
         resource = disaster_list[current_disaster]
-        for cid in range(1, 11):
+        #for cid in range(1, 11):
             #resource_poller.poll(cid, resource)
-            print "Polling %d, %s" % (cid, resource)
-
-        time.sleep(2)
+            #print "Polling %d, %s" % (cid, resource)
+        f.close()
+        time.sleep(10)

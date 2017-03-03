@@ -287,7 +287,7 @@ def get_allies():
     allies_json = {}
     allies_json['allies'] = []
     
-    for x in range(1, 12):
+    for x in range(1, 11):
         cur.execute("SELECT atpeace%s FROM relations WHERE cid='%s'" % (x, cid))
         relation = cur.fetchone()
         relation = int(relation[0])
@@ -330,7 +330,7 @@ def get_enemies():
     enemies_json = {}
     enemies_json['enemies'] = []
     
-    for x in range(1, 12):
+    for x in range(1, 11):
         cur.execute("SELECT atwar%s FROM relations WHERE cid='%s'" % (x, cid))
         relation = cur.fetchone()
         relation = int(relation[0])
