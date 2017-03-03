@@ -109,10 +109,7 @@ if __name__ == '__main__':
         current_disaster = pick_disaster()
         print current_disaster
         f.write(str(current_disaster))
-        resource = disaster_list[current_disaster]
-        #for cid in range(1, 11):
-            #resource_poller.poll(cid, resource)
-            #print "Polling %d, %s" % (cid, resource)
+        poll_teams(current_disaster)
         f.close()
         time.sleep(10)
 

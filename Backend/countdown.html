@@ -1,15 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Countdown</title>
+    <meta charset="utf-8"/>
     <script src="disaster.js"></script>
+    <link rel="stylesheet" type="text/css" href="countdown.css"/>
 </head>
 <body>
-    <h1>Next disaster</h1>
-    <div id="disaster"></div>
-    <script type="text/javascript">
-        setInterval(function() { loadDisaster('disaster.txt')}, 5000);
-    </script>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div id="main">
+                <div class="content">
+                    <div class="text">
+                        <h2 id='title_disaster'>Next Disaster:</h2><p id="disaster"></p>
+                        <script type="text/javascript">
+                            setInterval(function() { loadDisaster('disaster.txt')}, 5000);
+                            setInterval(function() { ticktock()}, 3600000);
+                        </script>
+                    </div> <!-- /.Text Div -->
+                    <div class="counter">
+                        <div id="countdown">
+  
+                        </div><!-- /#Countdown Div -->
+                    </div> <!-- /.Counter Div -->
+                </div> <!-- /.Content Div -->
+            </div> <!-- /#Main Div -->
+        </div> <!-- /.Columns Div -->
+    </div> <!-- /.Row Div -->
+</div> <!-- /.Container Div -->
 </body>
 </html>
-
