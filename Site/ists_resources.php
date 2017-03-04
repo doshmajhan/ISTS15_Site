@@ -99,7 +99,7 @@
 				<div id="water" style="display:none;width:500px;">
 					<h2>Water</h2>
 					<p>
-					Add new paragraph
+					This is water, when you have it you can share it.
 						<?php 
 						if($res['water'] != ""){
 							echo '
@@ -133,9 +133,9 @@
 					<h2>Food</h2>
 					<p>
 						<?php 
-						if($res['food'] != ""){echo $res['water'];}
+						if($res['food'] != ""){echo $res['food'];}
 						?> 					
-						Add new paragraph</a>
+						This is food, when you have food you can share it.</a>
 					</p>
 				</div>
 				</td>
@@ -147,7 +147,7 @@
 						<?php 
 						if($res['electricity'] != ""){echo $res['electricity'];}
 						?> 					
-						Add new paragraph</a>
+						This is electricity, when you have electricity you can share it.</a>
 					</p>
 				</div>
 				</td>
@@ -159,7 +159,7 @@
 						<?php 
 						if($res['gas'] != ""){echo $res['gas'];}
 						?> 					
-						Add new paragraph</a>
+						This is gas, when you have gas you can share it.</a>
 					</p>
 				</div>
 				</td>
@@ -171,7 +171,7 @@
 						<?php 
 						if($res['luxury'] != ""){echo $res['luxury'];}
 						?> 					
-						Add new paragraph</a>
+						This is luxury, when you have luxury you can share it</a>
 					</p>
 				</div>
 				<td>
