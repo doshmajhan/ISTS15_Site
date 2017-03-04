@@ -1,8 +1,0 @@
-{"Error Number": 506, "Time": 1487723011.161866, "Error Message": "The pin was of an invalid format", "Error X-Data": ""}
-{"Error Number": 501, "Time": 1487724820.578285, "Error Message": "The required arguments were not provided", "Error X-Data": "['session']"}
-{"Error Number": 501, "Time": 1487724870.999631, "Error Message": "The required arguments were not provided", "Error X-Data": "['session']"}
-{"Error Number": 506, "Time": 1487725293.726071, "Error Message": "The password was of an invalid format", "Error X-Data": ""}
-{"Error Number": 506, "Time": 1487725516.112319, "Error Message": "The pin was of an invalid format", "Error X-Data": ""}
-{"Error Number": 506, "Time": 1487725519.380824, "Error Message": "The pin was of an invalid format", "Error X-Data": ""}
-{"Error Number": 6, "Time": 1488509512.064303, "Error Message": "An invalid accountNum and password combination was provided", "Error X-Data": "1337"}
-{"Error Number": 900, "Time": 1488509512.116461, "Error Message": "The required arguments were not provided", "Error X-Data": "['accountNum']"}
