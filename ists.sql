@@ -1,14 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.1
--- https://www.phpmyadmin.net/
+-- version 4.4.15.10
+-- https://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 06, 2017 at 08:28 PM
--- Server version: 10.1.20-MariaDB
--- PHP Version: 7.0.15
+-- Generation Time: Mar 04, 2017 at 05:32 AM
+-- Server version: 5.7.17-0ubuntu0.16.04.1
+-- PHP Version: 7.0.15-0ubuntu0.16.04.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -18,14 +19,14 @@ SET time_zone = "+00:00";
 --
 -- Database: `ists`
 --
-use ists;
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `acquired_resources`
 --
 
-CREATE TABLE `acquired_resources` (
+CREATE TABLE IF NOT EXISTS `acquired_resources` (
   `cid` int(11) NOT NULL,
   `has_water` varchar(30) NOT NULL DEFAULT '0',
   `has_electricity` varchar(30) NOT NULL DEFAULT '0',
@@ -56,15 +57,27 @@ INSERT INTO `acquired_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 -- Table structure for table `auditing`
 --
 
-CREATE TABLE `auditing` (
-  `aid` int(16) NOT NULL,
+CREATE TABLE IF NOT EXISTS `auditing` (
+  `aid` int(11) NOT NULL,
   `cidsrc` int(16) NOT NULL,
   `ciddst` int(16) NOT NULL,
   `action` varchar(255) NOT NULL,
   `data` varchar(255) NOT NULL,
   `time` double NOT NULL,
   `ip` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `auditing`
+--
+
+INSERT INTO `auditing` (`aid`, `cidsrc`, `ciddst`, `action`, `data`, `time`, `ip`) VALUES
+(1, 4, 0, 'Logged in', 'none', 1488530162.25, '184.73.151.60'),
+(2, 4, 0, 'Logged in', 'none', 1488530163.6, '184.73.151.60'),
+(3, 5, 0, 'Logged in', 'none', 1488530186.85, '184.73.151.60'),
+(4, 1, 0, 'Logged in', 'none', 1488530214.66, '184.73.151.60'),
+(5, 1, 0, 'Logged in', 'none', 1488605420.63, '184.73.151.60'),
+(6, 1, 0, 'Logged in', 'none', 1488605481.93, '129.21.94.9');
 
 -- --------------------------------------------------------
 
@@ -72,7 +85,7 @@ CREATE TABLE `auditing` (
 -- Table structure for table `relations`
 --
 
-CREATE TABLE `relations` (
+CREATE TABLE IF NOT EXISTS `relations` (
   `cid` int(16) NOT NULL,
   `atwar1` int(1) NOT NULL DEFAULT '0',
   `atwar2` int(1) NOT NULL DEFAULT '0',
@@ -118,7 +131,7 @@ INSERT INTO `relations` (`cid`, `atwar1`, `atwar2`, `atwar3`, `atwar4`, `atwar5`
 -- Table structure for table `sessions`
 --
 
-CREATE TABLE `sessions` (
+CREATE TABLE IF NOT EXISTS `sessions` (
   `cid` int(16) NOT NULL,
   `sessionid` varchar(128) DEFAULT 'invalid',
   `time` double DEFAULT NULL,
@@ -130,11 +143,11 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`cid`, `sessionid`, `time`, `ip`) VALUES
-(1, 'invalid', NULL, NULL),
+(1, 'BNL0JESSNRRA0WSO3W2ZRVWUE1SNSRAZ', 1488605481.93, '129.21.94.9'),
 (2, 'invalid', NULL, NULL),
 (3, 'invalid', NULL, NULL),
-(4, 'invalid', NULL, NULL),
-(5, 'invalid', NULL, NULL),
+(4, 'NFYSQWNBL3ZRMPF9D5JZBUL1MWG9S891', 1488530163.59, '184.73.151.60'),
+(5, 'KQ1PALLH1JEQ0Y4HMGIDO1X4S1AHXQ3R', 1488530186.85, '184.73.151.60'),
 (6, 'invalid', NULL, NULL),
 (7, 'invalid', NULL, NULL),
 (8, 'invalid', NULL, NULL),
@@ -147,7 +160,7 @@ INSERT INTO `sessions` (`cid`, `sessionid`, `time`, `ip`) VALUES
 -- Table structure for table `starting_resources`
 --
 
-CREATE TABLE `starting_resources` (
+CREATE TABLE IF NOT EXISTS `starting_resources` (
   `cid` int(11) NOT NULL,
   `has_water` varchar(30) NOT NULL DEFAULT '0',
   `has_electricity` varchar(30) NOT NULL DEFAULT '0',
@@ -178,46 +191,50 @@ INSERT INTO `starting_resources` (`cid`, `has_water`, `has_electricity`, `has_ga
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `cid` int(16) NOT NULL,
   `countryname` varchar(32) NOT NULL,
   `password` varchar(64) NOT NULL DEFAULT 'password',
   `accountnum` int(10) NOT NULL,
   `balance` double NOT NULL DEFAULT '10000',
-  `pin` int(4) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `pin` int(4) NOT NULL DEFAULT '0',
+  `lasttransfer` int(11) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=1338 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, `pin`) VALUES
-(1, 'United States', 'password', 0801256325, 10000, 2913),
-(2, 'Canada', 'password', 9531494373, 10000, 6871),
-(3, 'United Kingdom', 'password', 7048811450, 10000, 6464),
-(4, 'Russia', 'password', 7460413969, 10000, 4468),
-(5, 'China', 'password', 8871302371, 10000, 6355),
-(6, 'South Korea', 'password', 1837375547, 10000, 0852),
-(7, 'Jamaica', 'password', 6585102787, 10000, 7709),
-(8, 'Germany', 'password', 8770266532, 10000, 7274),
-(9, 'Finland', 'password', 5334292398, 10000, 3239),
-(10, 'India', 'password', 5605213540, 10000, 0151),
-(111, 'ATM', 'ATM_IS_COOL', 7071337707, '0', '0'),
-(1337, 'Red Team', 'horsebatteryists15variable', 7862105372, 10000, 5499);
+INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, `pin`, `lasttransfer`) VALUES
+(1, 'United States', 'password', 9121217, 10000, 1987, NULL),
+(2, 'Canada', 'password', 2891231, 10000, 2782, NULL),
+(3, 'United Kingdom', 'password', 3912381, 10000, 3905, NULL),
+(4, 'Russia', 'password', 4102398, 10000, 7412, NULL),
+(5, 'China', 'password', 5981239, 10000, 5823, NULL),
+(6, 'South Africa', 'password', 7112821, 10000, 7789, NULL),
+(7, 'Brazil', 'password', 8889631, 10000, 8562, NULL),
+(8, 'Finland', 'password', 7843241, 10000, 6437, NULL),
+(9, 'India', 'password', 1002376, 10000, 1062, NULL),
+(10, 'Germany', 'password', 8934211, 10000, 8512, NULL),
+(111, 'ATM', 'ATM_IS_COOL', 1337, 0, 0, NULL),
+(1337, 'Red Team', 'horsebatteryists15variable', 4117117, 10000, 5499, NULL);
 
 --
 -- Indexes for dumped tables
 --
 
-ALTER TABLE `auditing`
-  ADD PRIMARY KEY (`aid`),
-  MODIFY COLUMN `aid` INT AUTO_INCREMENT;
 --
 -- Indexes for table `acquired_resources`
 --
 ALTER TABLE `acquired_resources`
   ADD PRIMARY KEY (`cid`),
   ADD UNIQUE KEY `cid` (`cid`);
+
+--
+-- Indexes for table `auditing`
+--
+ALTER TABLE `auditing`
+  ADD PRIMARY KEY (`aid`);
 
 --
 -- Indexes for table `relations`
@@ -252,10 +269,15 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `auditing`
+--
+ALTER TABLE `auditing`
+  MODIFY `aid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `cid` int(16) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `cid` int(16) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1338;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
