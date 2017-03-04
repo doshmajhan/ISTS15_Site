@@ -481,7 +481,7 @@ def add_ally():
         return jsonify(status)
     
     count = 0
-    for x in range(1, 12):
+    for x in range(1, 11):
         cur.execute("SELECT atpeace%s FROM relations WHERE cid='%s'" % (x, cid))
         relation = cur.fetchone()
         relation = int(relation[0])
