@@ -48,6 +48,7 @@ def log_action(src, dst, action, data, ip):
         :param data: the information passed in the action
         :param ip: the ip of the source 
     """
+    global db
     cur = db.cursor()
     t = time.time()
     cur.execute("INSERT INTO auditing (cidsrc, ciddst, action, data, time, ip) " \
@@ -62,6 +63,7 @@ def authenticate(session):
         :param session: the session variable submitted in the request
         :returns status: status of the authentication, the cid if valid, None if invalid
     """
+    global db
     cur = db.cursor()
     cur.execute("SELECT cid, time FROM sessions WHERE sessionid='%s'" % (session))
     result = cur.fetchone()
@@ -88,6 +90,7 @@ def check_ally(country1, country2):
         :param country2: the country the resource belongs to, accepts country or cid
         :return status: If the countries are allies or not, 1 if yes, 0 if no
     """
+    global db
     cur  = db.cursor()
 
     if isinstance(country1, int):
@@ -123,6 +126,7 @@ def check_resource(resource):
         :return country: the country the resource belongs to
         :return type: the type of resource the code is for
     """
+    global db
     cur = db.cursor()
 
     for r in resources:
@@ -142,6 +146,7 @@ def check_number_of_shares(cid, cid2):
         :param cid2: the cid of the country getting the shared resource
         :return check: true if they haven't shared a resource yet, false if they have
     """
+    global db
     cur = db.cursor()
     
     for r in resources:
@@ -174,6 +179,8 @@ def resource_stolen(resource_type, code, cid, owner):
         :param owner: the owner of the resource being stolen
 
     """
+    global db
+    cur = db.cursor()
     cur.execute("UPDATE starting_resources SET has_%s='%s' WHERE cid='%s'" 
                 % (resource_type, resource, cid))
     cur.execute("UPDATE starting_resources SET has_%s='0' WHERE cid='%s'"
@@ -204,6 +211,7 @@ def randomize_resource(resource, cid, old_code):
         :param cid: the cid of the country
         :param old_code: the old code value
     """
+    global db
     cur = db.cursor()
     new_code = code_generator.create_code()
     code_generator.update_code('starting_resources', new_code, resource, cid)
@@ -226,6 +234,7 @@ def login():
         :param password: the password for the country
         :return session: the newly created session token for that country
     """
+    global db
     args = flask.request.args
     country = args['country']
     password = args['password']
@@ -256,6 +265,7 @@ def authenticate_endpoint():
         :param session: the session variable submitted in the request
         :returns status: status of the authentication, the cid if valid, None if invalid
     """
+    global db
     args = flask.request.args
     session = args['session']
     if not session:
@@ -286,6 +296,7 @@ def get_name():
         :param session: the session id of the country thats logged in
         :return name: the name of the country
     """
+    global db
     args = flask.request.args
     session = args['session']
     cid = authenticate(session)
@@ -314,6 +325,7 @@ def get_resources():
         :param session: the session of the country requesting its resources
         :returns resource: a json object of the resources
     """
+    global db
     args = flask.request.args
     session = args['session']
     cid = authenticate(session)
@@ -355,6 +367,7 @@ def get_allies():
         :param session: the session token for the requesting country
         :return allies_json: a json object of the allies 
     """
+    global db
     args = flask.request.args
     session = args['session']
     country = args['country']  
@@ -398,6 +411,7 @@ def get_enemies():
         :param session: the session token for the requesting country
         :return enemies_json: a json object of the allies 
     """
+    global db
     args = flask.request.args
     session = args['session']
     country = args['country']
@@ -442,6 +456,7 @@ def add_ally():
         :param country: the name of the country being added
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
+    global db
     args = flask.request.args
     session = args['session']
     cid = authenticate(session)
@@ -496,6 +511,7 @@ def make_neutral():
         :param country: the name of the country being removed
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
+    global db
     args = flask.request.args
     session = args['session']
     cid = authenticate(session)
@@ -574,6 +590,7 @@ def declare_war():
         :param country: the name of the country being declared against
         :returns status: The status of the request, 200 for OK, 500+ if error
     """
+    global db
     args = flask.request.args
     session = args['session']
     cid = authenticate(session)
@@ -617,6 +634,7 @@ def add_resource():
         :param resource: the code of the resource being added
         :return status: status of the request, 200 for OK, 500+ for error
     """
+    global db
     args = flask.request.args
     cur = db.cursor()
     session = args['session']
@@ -683,6 +701,6 @@ def add_resource():
     return jsonify(status)
 
 
+db = connect_db()
 if __name__ == '__main__':
-    db = connect_db()
     app.run(host='0.0.0.0', port=5000)
