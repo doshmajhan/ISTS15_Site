@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `ists`
 --
-
+use ists;
 -- --------------------------------------------------------
 
 --
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `cid` int(16) NOT NULL,
   `countryname` varchar(32) NOT NULL,
   `password` varchar(64) NOT NULL DEFAULT 'password',
-  `accountnum` int(10) NOT NULL,
+  `accountnum` bigint(11) NOT NULL,
   `balance` double NOT NULL DEFAULT '10000',
   `pin` int(4) NOT NULL DEFAULT '0',
   `lasttransfer` int(11) DEFAULT NULL
@@ -206,18 +206,19 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, `pin`, `lasttransfer`) VALUES
-(1, 'United States', 'password', 9121217, 10000, 1987, NULL),
-(2, 'Canada', 'password', 2891231, 10000, 2782, NULL),
-(3, 'United Kingdom', 'password', 3912381, 10000, 3905, NULL),
-(4, 'Russia', 'password', 4102398, 10000, 7412, NULL),
-(5, 'China', 'password', 5981239, 10000, 5823, NULL),
-(6, 'South Africa', 'password', 7112821, 10000, 7789, NULL),
-(7, 'Brazil', 'password', 8889631, 10000, 8562, NULL),
-(8, 'Finland', 'password', 7843241, 10000, 6437, NULL),
-(9, 'India', 'password', 1002376, 10000, 1062, NULL),
-(10, 'Germany', 'password', 8934211, 10000, 8512, NULL),
+(1, 'United States', 'password', 0801256325, 10000, 1987, NULL),
+(2, 'Canada', 'password', 9531494373, 10000, 2782, NULL),
+(3, 'United Kingdom', 'password', 7048811450, 10000, 3905, NULL),
+(4, 'Russia', 'password', 7460413969, 10000, 7412, NULL),
+(5, 'China', 'password', 8871302371, 10000, 5823, NULL),
+(6, 'South Africa', 'password', 1837375547, 10000, 7789, NULL),
+(7, 'Brazil', 'password', 6585102787, 10000, 8562, NULL),
+(8, 'Australia', 'password', 8770266532, 10000, 6437, NULL),
+(9, 'India', 'password', 5334292398, 10000, 1062, NULL),
+(10, 'Germany', 'password', 5605213540, 10000, 8512, NULL),
 (111, 'ATM', 'ATM_IS_COOL', 1337, 0, 0, NULL),
-(1337, 'Red Team', 'horsebatteryists15variable', 4117117, 10000, 5499, NULL);
+(1337, 'Red Team', 'horsebatteryists15variable', 7862105372, 10000, 5499, NULL);
+
 
 --
 -- Indexes for dumped tables

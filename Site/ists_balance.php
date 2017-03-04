@@ -17,28 +17,17 @@
 			});
 		}, 3000);		
 
-	});
-                $( "#country_select" ).change(function () {
-                        var str = "";
-                        $( "select option:selected" ).each(function() {
-                                var country_name = $( this ).text();
-                                $.get( "get_conflicts.php?country="+country_name, function( data ) {
-                                  $( "#conflict_data" ).html( data );
-                                });                             
-                        });
-                }).change();
-                var my_country = "<?php echo get_name($backend,$scheme,$port,$_SESSION['session']); ?>";
-                $("#country_select option").each(function(){
-                        if($(this).text()==my_country){
-                                $(this).attr("selected","selected");
-                                var country_name = $( this ).text();
-                                setTimeout(function(){
-                                }, 500);                                
-                                $.get( "get_conflicts.php?country="+country_name, function( data ) {
-                                  $( "#conflict_data" ).html( data );
-                                });                                     
-                        }
+                $( "#sub" ).submit(function (e) {
+			e.preventDefault();
+                        $.get( "change_settings.php?"+$("#sub").serialize(), function( data ) {
+                        	$( "#tran_data" ).html( data );
+			    setTimeout(function() {
+			        $("#tran_data").hide('blind', {}, 500)
+			    }, 5000);
+                        });                             
                 });
+
+	});
 
 	</script>
 </head>
@@ -57,9 +46,11 @@
 
 			<div id="page_data">
 				Your balance is: <div id="bal">Loading...</div><br /><br />
+ 				<div id="tran_data"></div>
 				<form id="sub">
-                                Send $ <input style="width:60px;" type="input" /> to 
-                                <select id="country_select">
+				<input type="hidden" name="transfer" value="true">
+                                Send $ <input style="width:60px;" name="amount" type="input" /> to 
+                                <select id="country_select" name="dest">
                                   <option>Australia</option>
                                   <option>Brazil</option>
                                   <option>Canada</option>

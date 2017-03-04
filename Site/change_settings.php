@@ -3,7 +3,7 @@ if(!isset($_SESSION)) { session_start(); }
 if(!isset($_SESSION['logged_in'])){
 	die();
 }
-if(!isset($_GET['password']) and !isset($_GET['pin']) and !isset($_GET['balance'])){
+if(!isset($_GET['password']) and !isset($_GET['pin']) and !isset($_GET['balance']) and !isset($_GET['transfer'])){
 	exit("We didn't get the arguments we expected");
 }
 include_once('api_calls.php');
@@ -33,5 +33,11 @@ if(isset($_GET['balance'])){
 	}else{
 		echo "Loading...";
 	}
+}
+
+if(isset($_GET['transfer']) and isset($_GET['amount']) and isset($_GET['dest'])){
+	$cname = get_name($backend,$scheme,$port,$_SESSION['session']);
+	$output = transfer($cname,$bank,$_SESSION['session'],$_GET['amount'],$_GET['dest']);
+	echo json_decode($output);
 }
 ?>

@@ -330,6 +330,58 @@ function get_balance($cname,$bank,$session){
 	return $response;
 }
 
+// if returns true it will return the resource it added
+function get_trans($bank,$session){
+        $ch = curl_init();
+        $fields = array(
+                'session' => urlencode($session)
+        );
+        $fields_string = "";
+        foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+        $fields_string = rtrim($fields_string, '&');
+        $url = $bank.'/getTrans';
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $response = json_decode($response);
+        $response = json_decode(json_encode($response), True);
+        return $response;
+}
+
+// if returns true it will return the resource it added
+function transfer($cname,$bank,$session,$amount,$dest){
+        $ch = curl_init();
+        $fields = array(
+                'countryname' => urlencode($cname),
+                'session' => urlencode($session),
+                'amount' => urlencode($amount),
+                'destcountry' => urlencode($dest)
+        );
+        $fields_string = "";
+        foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+        $fields_string = rtrim($fields_string, '&');
+        $url = $bank.'/transferFunds';
+
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+	echo $response;
+        $response = json_decode($response);
+        $response = json_decode(json_encode($response), True);
+        return $response;
+}
+
+
 function add_res_country($backend,$scheme,$port,$session,$resource_code,$country){
 	$ch = curl_init();
 	$fields = array(

@@ -131,7 +131,6 @@ def retBalance():
     if valid == True:
         data = { 'Balance': result.balance }
         encoded_data = json.dumps(data)
-        addAudit(cid,"-1","Balanced fetched",result.balance,remote_ip)
         return encoded_data
 
     else:
@@ -252,6 +251,7 @@ def tran():
                 return json.dumps("You may not transfer negative amounts")
             if not amount.isdigit():
                 return writeLogMessage(806,"An invalid accountNum was provided",amount)
+            addAudit(cid,request.form["destcountry"],"TESTING"+dest,"",remote_ip)
             result2.balance = result2.balance + float(amount)
             result.balance = result.balance - float(amount)
             result.lasttransfer = time.time()
