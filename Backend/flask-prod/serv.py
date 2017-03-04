@@ -51,6 +51,32 @@ class Session(db.Model):
         self.time = time
         self.ip = ip
 
+class Audit(db.Model):
+    __tablename__ = 'auditing'
+    aid = db.Column(db.Integer,primary_key=True)
+    cidsrc = db.Column(db.String(255))
+    ciddst = db.Column(db.String(255))
+    action = db.Column(db.String(255))
+    data = db.Column(db.String(255))
+    time = db.Column(db.Float())
+    ip = db.Column(db.String(16))
+
+    def __init__(self, aid=None, cidsrc=None, ciddst=None, action=None, data=None, time=None, ip=None):
+        self.aid = aid
+        self.cidsrc = cidsrc
+        self.ciddst = ciddst
+        self.action = action
+        self.data = data
+        self.time = time
+        self.ip = ip
+
+def addAudit(cidsrc,ciddst,action,data,ip):
+    me = Audit(cidsrc=str(cidsrc),ciddst=str(ciddst),action=action,data=data,time=time.time(),ip=ip)
+    db.session.add(me)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        return None
 
 def writeLogMessage(number,message,data):
         message = {'Error Number':number, 'Error Message':message, 'Error X-Data':data, 'Time':time.time()}
@@ -96,7 +122,7 @@ def retBalance():
         url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
         print url
         r = requests.get(url)
-        if int(r.text)==int(cid):
+        if str(r.text).isdigit() and int(r.text)==int(cid):
             valid = True
         else:
             return writeLogMessage(502,"The session identifier provided expired or was invalid", request.form["session"])
@@ -105,8 +131,9 @@ def retBalance():
     if valid == True:
         data = { 'Balance': result.balance }
         encoded_data = json.dumps(data)
+        addAudit(cid,"-1","Balanced fetched",result.balance,remote_ip)
         return encoded_data
-        addAuditEntry(accountNum,"","Balance was requested","Balance Returned was "+str(resAccount.balance), 0,remote_ip)
+
     else:
         return writeLogMessage(504,"Somehow we got an invalid request, this shouldn't happen", "")
 
@@ -132,7 +159,7 @@ def viewPin():
         url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
         print url
         r = requests.get(url)
-        if int(r.text)==int(cid):
+        if  str(r.text).isdigit() and int(r.text)==int(cid):
             valid = True
         else:
             return writeLogMessage(502,"The session identifier provided expired or was invalid", request.form["session"])
@@ -141,8 +168,8 @@ def viewPin():
     if valid == True:
         data = { 'Pin': result.pin }
         encoded_data = json.dumps(data)
+        addAudit(cid,"-1","Viewed PIN",result.pin,remote_ip)
         return encoded_data
-        addAuditEntry(accountNum,"","Balance was requested","Balance Returned was "+str(resAccount.balance), 0,remote_ip)
     else:
         return writeLogMessage(504,"Somehow we got an invalid request, this shouldn't happen", "")
 
@@ -168,7 +195,7 @@ def changePin():
         url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
         print url
         r = requests.get(url)
-        if int(r.text)==int(cid):
+        if  str(r.text).isdigit() and int(r.text)==int(cid):
             valid = True
         else:
             return writeLogMessage(502,"The session identifier provided expired or was invalid", request.form["session"])
@@ -185,12 +212,8 @@ def changePin():
             return writeLogMessage(507, "We had an issue updating our pin, with the DB",str(e))
     data = [ { 'Status': "Completed" } ]
     encoded_data = json.dumps(data)
-    #addAuditEntry(accountNum,"","Pin was changed","Pin was changed to " + str(request.form["newPin"]),0,remote_ip
+    addAudit(cid,"-1","The pin was changed",request.form["newPin"],remote_ip)
     return encoded_data
-
-@app.route("/",methods=['GET','POST'])
-def index():
-    return "TEST"
 
 @app.route("/transferFunds",methods=['GET','POST'])
 def tran():
@@ -213,7 +236,7 @@ def tran():
         url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
         print url
         r = requests.get(url)
-        if int(r.text)==int(cid):
+        if  str(r.text).isdigit() and  int(r.text)==int(cid):
             valid = True
     if valid == True:
         result = Users.query.filter(Users.countryname == accountNum).first()
@@ -221,7 +244,8 @@ def tran():
             dest = request.form["destcountry"]
             result2 = Users.query.filter(Users.countryname == dest).first()
             amount = request.form["amount"]
-            if amount > 60000:
+            if amount.isdigit() and float(amount) > 60000:
+                addAudit(cid,dest,"Transfer Funds too large",amount,remote_ip)
                 return json.dumps("You may only transfer a max of $60,000")
             if not amount.isdigit():
                 return writeLogMessage(806,"An invalid accountNum was provided",amount)
@@ -233,9 +257,11 @@ def tran():
             except IntegrityError as e:
                 return writeLogMessage(807, "We had an issue updating our pin, with the DB",str(e))
         else:
+            addAudit(cid,request.form["destcountry"],"Transfer funds too often",request.form["amount"],remote_ip)
             return json.dumps("You can only transfer once every 10 minutes")
     else:
         return writeLogMessage(809, "invalid session",str(r.text))
+    addAudit(cid,request.form["destcountry"],"Transfer Funds",request.form["amount"],remote_ip)
     data = [ { 'Status': "Completed" } ]
     encoded_data = json.dumps(data)
     return str(encoded_data)
@@ -263,7 +289,7 @@ def changePassword():
         url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
         print url
         r = requests.get(url)
-        if int(r.text)==int(cid):
+        if  str(r.text).isdigit() and int(r.text)==int(cid):
             valid = True
         else:
             return writeLogMessage(502,"The session identifier provided expired or was invalid", request.form["session"])
@@ -278,9 +304,9 @@ def changePassword():
             db.session.commit()
         except IntegrityError as e:
             return writeLogMessage(507, "We had an issue updating our password with the DB",str(e))
+    addAudit(cid,"-1","Changed password","",remote_ip)
     data = [ { 'Status': "Completed" } ]
     encoded_data = json.dumps(data)
-    #addAuditEntry(accountNum,"","Pin was changed","Pin was changed to " + str(request.form["newPin"]),0,remote_ip
     return encoded_data
 if __name__ == "__main__":
 	print app.config['LISTENADDR']
