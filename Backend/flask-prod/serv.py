@@ -310,5 +310,5 @@ def changePassword():
     return encoded_data
 if __name__ == "__main__":
 	print app.config['LISTENADDR']
-	app.run(host=app.config['LISTENADDR'],port=1337,debug=True)
+	app.run(host=app.config['LISTENADDR'],port=1337,debug=False)
 
