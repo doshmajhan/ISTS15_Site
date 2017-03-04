@@ -202,7 +202,7 @@ INSERT INTO `users` (`cid`, `countryname`, `password`, `accountnum`, `balance`, 
 (8, 'Germany', 'password', 8770266532, 10000, 7274),
 (9, 'Finland', 'password', 5334292398, 10000, 3239),
 (10, 'India', 'password', 5605213540, 10000, 0151),
-(111, 'ATM', 'ATM_IS_COOL', 1337, '0', '0'),
+(111, 'ATM', 'ATM_IS_COOL', 7071337707, '0', '0'),
 (1337, 'Red Team', 'horsebatteryists15variable', 7862105372, 10000, 5499);
 
 --
