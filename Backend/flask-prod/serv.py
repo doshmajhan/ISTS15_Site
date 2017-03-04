@@ -247,6 +247,9 @@ def tran():
             if amount.isdigit() and float(amount) > 60000:
                 addAudit(cid,dest,"Transfer Funds too large",amount,remote_ip)
                 return json.dumps("You may only transfer a max of $60,000")
+            if amount.isdigit() and float(amount) <= 0:
+                addAudit(cid,dest,"Transfer Funds too small",amount,remote_ip)
+                return json.dumps("You may not transfer negative amounts")
             if not amount.isdigit():
                 return writeLogMessage(806,"An invalid accountNum was provided",amount)
             result2.balance = result2.balance + float(amount)
