@@ -345,8 +345,8 @@ function get_trans($bank,$session){
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS,$fields_string);
-
         $response = curl_exec($ch);
+	echo $response;
         curl_close($ch);
         $response = json_decode($response);
         $response = json_decode(json_encode($response), True);

@@ -136,6 +136,46 @@ def retBalance():
     else:
         return writeLogMessage(504,"Somehow we got an invalid request, this shouldn't happen", "")
 
+@app.route("/getTrans",methods=['GET','POST'])
+def seetran():
+    remote_ip = request.remote_addr
+    required = ["session"]
+    # Check if we got our required params
+    for param in required:
+        if param in request.form.keys():
+            continue
+        else:
+            return writeLogMessage(501,"The required arguments were not provided", str(request.form.keys()))
+    valid = False
+    # Check if we got our required params
+    if(len(request.form["session"]) != 0):
+        url = 'http://'+app.config['APIADDR']+'/authenticate?session=' + request.form["session"]
+        print url
+        r = requests.get(url)
+        if  str(r.text).isdigit():
+            cid = r.text
+            valid = True
+        else:
+            return writeLogMessage(502,"The session identifier provided expired or was invalid", request.form["session"])
+    else:
+        return writeLogMessage(503,"The session param provided was empty","")
+    if valid == True:
+        result = Audit.query.filter((Audit.cidsrc == cid) | (Audit.ciddst == cid)).all()
+        x = ""
+        x+= "<table style='color:white;border:1px solid white;border-collapse: collapse;'><tr><th>src</th><th>dst</th><th>action</th><th>data</th><th>time</th><th>ip</th><tr>"
+        for i in result:
+            x += "<tr>"
+            x += str("<td>"+str(i.cidsrc)+"</td>")
+            x += str("<td>"+str(i.ciddst)+"</td>")
+            x += str("<td>"+str(i.action)+"</td>")
+            x += str("<td>"+str(i.data)+"</td>")
+            x += str("<td>"+str(i.time)+"</td>")
+            x += str("<td>"+str(i.ip)+"</td>")
+            x += "</tr>"
+        x+="</table>"
+        return x
+     
+
 #Takes a accountNum and session
 @app.route("/viewPin",methods=['GET','POST'])
 def viewPin():
@@ -251,7 +291,6 @@ def tran():
                 return json.dumps("You may not transfer negative amounts")
             if not amount.isdigit():
                 return writeLogMessage(806,"An invalid accountNum was provided",amount)
-            addAudit(cid,request.form["destcountry"],"TESTING"+dest,"",remote_ip)
             result2.balance = result2.balance + float(amount)
             result.balance = result.balance - float(amount)
             result.lasttransfer = time.time()
